@@ -11,6 +11,7 @@
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
 #include <sierra/ui/widgets/render_viewport.hpp>
+#include <sierra/ui/widgets/asset_browser.hpp>
 
 namespace SierraEditor::UI {
     class MainWindow : public QMainWindow {
@@ -25,5 +26,6 @@ namespace SierraEditor::UI {
             RenderViewport* mViewport;
             HierarchyPanel* mHierarchy;
             InspectorPanel* mInspector;
+            AssetBrowser* mAssetBrowser;
     };
 }

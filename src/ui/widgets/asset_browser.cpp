@@ -1,14 +1,14 @@
-// hierarchy_panel.cpp
+// asset_browser.cpp
 // Licensed under LGPLv2
 
-#include <sierra/ui/widgets/hierarchy_panel.hpp>
+#include <sierra/ui/widgets/asset_browser.hpp>
 
 namespace SierraEditor::UI {
-    HierarchyPanel::HierarchyPanel(QWidget* parent)
+    AssetBrowser::AssetBrowser(QWidget* parent)
         : QWidget(parent)
     {
         mTree = new QTreeWidget(this);
-        mTree->setHeaderLabel("Scene Objects");
+        mTree->setHeaderLabel("Assets");
 
         // Placeholders
         auto* root = new QTreeWidgetItem(mTree, QStringList() << "Root");

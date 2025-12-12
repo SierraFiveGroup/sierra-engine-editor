@@ -1,0 +1,24 @@
+// start_window_widget.hpp
+// Licensed under LGPLv2
+
+#pragma once
+
+#include <QWidget>
+#include <QVBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QObject>
+
+namespace SierraEditor::UI {
+    class StartWindowWidget : public QWidget {
+        Q_OBJECT
+        public:
+            explicit StartWindowWidget(QWidget* parent = nullptr);
+    
+        private:
+            QLabel* mWelcomeLabel;
+            QPushButton* mNewProjectButton;
+            QPushButton* mOpenProjectButton;
+    
+    };
+}

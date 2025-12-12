@@ -38,5 +38,11 @@ namespace SierraEditor::UI {
         mInspector = new InspectorPanel();
         inspectorDock->setWidget(mInspector);
         addDockWidget(Qt::RightDockWidgetArea, inspectorDock);
+
+        // Asset Browser
+        auto* assetBrowserDock = new QDockWidget("Asset Browser", this);
+        mAssetBrowser = new AssetBrowser();
+        assetBrowserDock->setWidget(mAssetBrowser);
+        addDockWidget(Qt::BottomDockWidgetArea, assetBrowserDock);
     }
 }
