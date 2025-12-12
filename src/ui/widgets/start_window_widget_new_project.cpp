@@ -4,6 +4,15 @@
 #include <sierra/ui/widgets/start_window_widget_new_project.hpp>
 #include <sierra/ui/window/main_window.hpp>
 
+#if !defined(__WIN32__)
+    #include <unistd.h>
+    #include <sys/stat.h>
+    #include <sys/types.h>
+#else
+    #include <windows.h>
+    #include <direct.h>
+#endif
+
 namespace SierraEditor::UI {
     StartWindowWidgetNewProject::StartWindowWidgetNewProject(QWidget* parent)
         : QWidget(parent)
@@ -17,20 +26,63 @@ namespace SierraEditor::UI {
         mProjectPath = new QLabel("Project Path: C:\\path\\to\\project", this);
         #endif
 
+        mNameInput = new QLineEdit(this);
+        mPathInput = new QLineEdit(this);
         mFileDialogButton = new QPushButton("Browse...", this);
+        mCreateProjectButton = new QPushButton("Create Project", this);
 
         // Bind to file dialog
         connect(mFileDialogButton, &QPushButton::clicked, [this]() {
-            QString dir = QFileDialog::getExistingDirectory(this, tr("Select Project Directory"), "/", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks);
+            QString dir = QFileDialog::getExistingDirectory(this, tr("Select Project Directory"), "/", QFileDialog::ShowDirsOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
             if (!dir.isEmpty()) {
                 mPathInput->setText(dir);
             }
         });
 
-        mCreateProjectButton = new QPushButton("Create Project", this);
+        // Make a directory at that path with the project name (platform specific)
+        connect(mCreateProjectButton, &QPushButton::clicked, [this]() {
+            if (mNameInput->text().isEmpty() || mPathInput->text().isEmpty()) {
+                // Tell user to fill in all fields
+                QMessageBox::warning(
+                    this, // Parent widget (nullptr for no parent)
+                    "Missing Information", // Title of the message box
+                    "Please fill in both the project name and/or project path.", // Message text
+                    QMessageBox::Ok, // Standard buttons
+                    QMessageBox::Ok // Default button
+                );
+                return;
+            }
 
-        mNameInput = new QLineEdit(this);
-        mPathInput = new QLineEdit(this);
+            #if !defined(__WIN32__)
+
+            QString fullPath = mPathInput->text() + "/" + mNameInput->text();
+            mkdir(fullPath.toStdString().c_str(), 0755);
+
+            // Write a placeholder project file in the directory (XML format maybe?)
+            QFile file(fullPath + "/" + mNameInput->text() + ".sierra");
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream << "<SierraProject>\n";
+                stream << "    <Version>1</Version>\n";
+                stream << "    <Name>" << mNameInput->text() << "</Name>\n";
+                stream << "</SierraProject>\n";
+                file.close();
+            }
+
+            this->close();
+            auto* mainWindow = new MainWindow();
+            mainWindow->show();
+
+            #else
+
+            QString fullPath = mPathInput->text() + "\\" + mNameInput->text();
+            _mkdir(fullPath.toStdString().c_str());
+            this->close();
+            auto* mainWindow = new MainWindow();
+            mainWindow->show();
+
+            #endif
+        });
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->addWidget(mNameLabel);

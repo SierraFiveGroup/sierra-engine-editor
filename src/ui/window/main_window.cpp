@@ -20,30 +20,67 @@ namespace SierraEditor::UI {
     }
 
     void MainWindow::mSetupMenus() {
+        // Actions
+        QAction* openProjectAction = new QAction("Open Project", this);
+
+        QAction* saveAllAction = new QAction("Save All", this);
+        //saveAllAction->setShortcut(QKeySequence(std::string(SUPER_KEY) + "+S"));
+
+        QAction* exitAction = new QAction("Exit", this);
+        //exitAction->setShortcut(QKeySequence(std::string(SUPER_KEY) + "+Q"));
+        connect(exitAction, &QAction::triggered, this, &MainWindow::close);
+
+        QAction* spawnHierarchyAction = new QAction("Hierarchy", this);
+        /*connect(spawnHierarchyAction, &QAction::triggered, this, []() {
+        });*/
+
+        QAction* spawnInspectorAction = new QAction("Inspector", this);
+        //connect(spawnInspectorAction, &QAction::triggered, this, []() {
+        //});
+
+        QAction* spawnAssetBrowserAction = new QAction("Asset Browser", this);
+        //connect(spawnAssetBrowserAction, &QAction::triggered, this, []() {
+        //});
+
+        // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
-        fileMenu->addAction("New Project");
-        fileMenu->addAction("Open...");
+        fileMenu->addAction(openProjectAction);
         fileMenu->addSeparator();
-        fileMenu->addAction("Exit", this, SLOT(close()));
+        fileMenu->addAction(saveAllAction);
+        fileMenu->addSeparator();
+        fileMenu->addAction(exitAction);
+
+        QMenu* editMenu = menuBar()->addMenu("Edit");
+        editMenu->addAction("Undo");
+        editMenu->addAction("Redo");
+        editMenu->addSeparator();
+        editMenu->addAction("Cut");
+        editMenu->addAction("Copy");
+        editMenu->addAction("Paste");
+
+        QMenu* windowMenu = menuBar()->addMenu("Window");
+        windowMenu->addAction(spawnHierarchyAction);
+        windowMenu->addAction(spawnInspectorAction);
+        windowMenu->addAction(spawnAssetBrowserAction);
     }
 
     void MainWindow::mSetupDockPanels() {
         // Hierarchy
-        auto* hierarchyDock = new QDockWidget("Hierarchy", this);
+        mHierarchyDock = new QDockWidget("Hierarchy", this);
         mHierarchy = new HierarchyPanel();
-        hierarchyDock->setWidget(mHierarchy);
-        addDockWidget(Qt::LeftDockWidgetArea, hierarchyDock);
+        mHierarchyDock->setWidget(mHierarchy);
+        addDockWidget(Qt::LeftDockWidgetArea, mHierarchyDock);
 
         // Inspector
-        auto* inspectorDock = new QDockWidget("Inspector", this);
+        mInspectorDock = new QDockWidget("Inspector", this);
         mInspector = new InspectorPanel();
-        inspectorDock->setWidget(mInspector);
-        addDockWidget(Qt::RightDockWidgetArea, inspectorDock);
+        mInspectorDock->setWidget(mInspector);
+        addDockWidget(Qt::RightDockWidgetArea, mInspectorDock);
 
         // Asset Browser
-        auto* assetBrowserDock = new QDockWidget("Asset Browser", this);
+        mAssetBrowserDock = new QDockWidget("Asset Browser", this);
         mAssetBrowser = new AssetBrowser();
-        assetBrowserDock->setWidget(mAssetBrowser);
-        addDockWidget(Qt::BottomDockWidgetArea, assetBrowserDock);
+        mAssetBrowserDock->setWidget(mAssetBrowser);
+        addDockWidget(Qt::BottomDockWidgetArea, mAssetBrowserDock);
     }
 }

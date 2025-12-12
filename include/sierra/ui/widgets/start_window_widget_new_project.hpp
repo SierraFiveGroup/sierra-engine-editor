@@ -11,6 +11,10 @@
 #include <QLineEdit>
 #include <QFileDialog>
 #include <QString>
+#include <QTextStream>
+#include <QFile>
+#include <QIODevice>
+#include <QMessageBox>
 
 namespace SierraEditor::UI {
     class StartWindowWidgetNewProject : public QWidget {
