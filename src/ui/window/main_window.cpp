@@ -7,6 +7,7 @@ namespace SierraEditor::UI {
     MainWindow::MainWindow(QWidget* parent)
         : QMainWindow(parent)
     {
+        this->setWindowTitle("Sierra Engine Editor");
         mSetupMenus();
 
         // The viewport is the central widget
