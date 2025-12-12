@@ -66,21 +66,24 @@ namespace SierraEditor::UI {
 
     void MainWindow::mSetupDockPanels() {
         // Hierarchy
-        mHierarchyDock = new QDockWidget("Hierarchy", this);
-        mHierarchy = new HierarchyPanel();
-        mHierarchyDock->setWidget(mHierarchy);
-        addDockWidget(Qt::LeftDockWidgetArea, mHierarchyDock);
+        auto* left = new QDockWidget("Hierarchy", this);
+        mGenericLeft = new GenericPanel();
+        //mGenericLeft->addNewTab(new HierarchyPanel(), "Hierarchy");
+        left->setWidget(mGenericLeft);
+        addDockWidget(Qt::LeftDockWidgetArea, left);
 
         // Inspector
-        mInspectorDock = new QDockWidget("Inspector", this);
-        mInspector = new InspectorPanel();
-        mInspectorDock->setWidget(mInspector);
-        addDockWidget(Qt::RightDockWidgetArea, mInspectorDock);
+        auto* right = new QDockWidget("Inspector", this);
+        mGenericRight = new GenericPanel();
+        //mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
+        right->setWidget(mGenericRight);
+        addDockWidget(Qt::RightDockWidgetArea, right);
 
         // Asset Browser
-        mAssetBrowserDock = new QDockWidget("Asset Browser", this);
-        mAssetBrowser = new AssetBrowser();
-        mAssetBrowserDock->setWidget(mAssetBrowser);
-        addDockWidget(Qt::BottomDockWidgetArea, mAssetBrowserDock);
+        auto* bottom = new QDockWidget("Asset Browser", this);
+        mGenericBottom = new GenericPanel();
+        //mGenericBottom->addNewTab(new AssetBrowser(), "Asset Browser");
+        bottom->setWidget(mGenericBottom);
+        addDockWidget(Qt::BottomDockWidgetArea, bottom);
     }
 }

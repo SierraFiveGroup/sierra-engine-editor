@@ -9,6 +9,12 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
+#ifndef STB_EASY_FONT_IMPLEMENTATION
+#define STB_EASY_FONT_IMPLEMENTATION
+#endif
+
+#include <stb/stb_easy_font.h>
+
 namespace SierraEditor::UI {
     class RenderViewport : public QWidget {
         Q_OBJECT

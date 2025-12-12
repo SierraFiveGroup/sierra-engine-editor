@@ -15,6 +15,7 @@
 #include <sierra/ui/widgets/inspector_panel.hpp>
 #include <sierra/ui/widgets/render_viewport.hpp>
 #include <sierra/ui/widgets/asset_browser.hpp>
+#include <sierra/ui/widgets/generic_panel.hpp>
 
 #include <unordered_map>
 
@@ -39,18 +40,8 @@ namespace SierraEditor::UI {
             std::unordered_map<std::string, QDockWidget*> mActiveWidgets;
     
             RenderViewport* mViewport;
-            HierarchyPanel* mHierarchy;
-            InspectorPanel* mInspector;
-            AssetBrowser* mAssetBrowser;
-
-            // Docked Widget pointers for the above panels
-            QDockWidget* mHierarchyDock;
-            QDockWidget* mInspectorDock;
-            QDockWidget* mAssetBrowserDock;
-
-            // States
-            bool mIsHierarchyOpen = true;
-            bool mIsInspectorOpen = true;
-            bool mIsAssetBrowserOpen = true;
+            GenericPanel* mGenericLeft;
+            GenericPanel* mGenericRight;
+            GenericPanel* mGenericBottom;
     };
 }
