@@ -10,15 +10,18 @@
 #include <QAction>
 #include <QKeySequence>
 #include <sierra/ui/window/main_window.hpp>
+#include <QString>
+#include <QFileDialog>
+#include <QDir>
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
 #include <sierra/ui/widgets/render_viewport.hpp>
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/generic_panel.hpp>
-
+#include <sierra/project/sproject.hpp>
 #include <unordered_map>
-
+#include <memory>
 #include <string>
 
 namespace SierraEditor::UI {
@@ -29,15 +32,16 @@ namespace SierraEditor::UI {
         
         private:
             #if defined(__APPLE__)
-            constexpr static const char* SUPER_KEY = "Command";
+            constexpr static const uint32_t SUPER_KEY = Qt::META; // Entries are 32-bit
             #else
-            constexpr static const char* SUPER_KEY = "Ctrl";
+            constexpr static const uint32_t SUPER_KEY = Qt::CTRL;
             #endif
 
             void mSetupDockPanels();
             void mSetupMenus();
 
             std::unordered_map<std::string, QDockWidget*> mActiveWidgets;
+            std::shared_ptr<Project::SProject> mCurrentProject;
     
             RenderViewport* mViewport;
             GenericPanel* mGenericLeft;

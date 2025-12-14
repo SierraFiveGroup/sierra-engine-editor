@@ -33,6 +33,11 @@ namespace SierraEditor::UI {
         plusButton->setText("+");
         plusButton->setAutoRaise(true);
         plusButton->setToolTip("Add panel");
+        plusButton->setMaximumWidth(30);
+        plusButton->setMaximumHeight(24);
+
+        // Ensure tab bar has minimum height for corner widget visibility
+        tabs->tabBar()->setMinimumHeight(24);
 
         tabs->setCornerWidget(plusButton, Qt::TopRightCorner);
 
@@ -58,15 +63,15 @@ namespace SierraEditor::UI {
         QString title;
 
         if (chosen == inspectorAction) {
-            newWidget = new QLabel("Inspector Panel");
+            newWidget = new InspectorPanel();
             title = "Inspector";
         }
         else if (chosen == hierarchyAction) {
-            newWidget = new QLabel("Hierarchy Panel");
+            newWidget = new HierarchyPanel();
             title = "Hierarchy";
         }
         else if (chosen == assetAction) {
-            newWidget = new QLabel("Asset Browser");
+            newWidget = new AssetBrowser();
             title = "Asset Browser";
         }
         else if (chosen == consoleAction) {

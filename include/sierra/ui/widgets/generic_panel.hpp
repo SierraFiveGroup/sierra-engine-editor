@@ -11,6 +11,9 @@
 #include <QLabel>
 
 #include <sierra/ui/widgets/always_visible_tabwidget.hpp>
+#include <sierra/ui/widgets/asset_browser.hpp>
+#include <sierra/ui/widgets/inspector_panel.hpp>
+#include <sierra/ui/widgets/hierarchy_panel.hpp>
 
 namespace SierraEditor::UI {
     class GenericPanel : public QWidget {

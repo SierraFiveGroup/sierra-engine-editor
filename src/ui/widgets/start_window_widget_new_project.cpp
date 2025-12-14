@@ -65,9 +65,25 @@ namespace SierraEditor::UI {
                 stream << "<SierraProject>\n";
                 stream << "    <Version>1</Version>\n";
                 stream << "    <Name>" << mNameInput->text() << "</Name>\n";
+                stream << "    <Directories>\n";
+                stream << "        <Assets>assets/</Assets>\n"; // Might have to be ./assets/ depending on how we handle paths
+                stream << "        <Scripts>scripts/</Scripts>\n";
+                stream << "    </Directories>\n";
+                stream << "    <Metadata>\n";
+                stream << "        <Created>" << QDate::currentDate().toString(Qt::ISODate) << "</Created>\n";
+                stream << "        <Modified>" << QDate::currentDate().toString(Qt::ISODate) << "</Modified>\n";
+                stream << "    </Metadata>\n";
+                stream << "    <Preferences>\n";
+                stream << "        <LastOpenedScene></LastOpenedScene>\n";
+                stream << "    </Preferences>\n";
                 stream << "</SierraProject>\n";
                 file.close();
             }
+
+            // These directories MUST exist. The editor will bundle assets and compile scripts from these folders.
+            // ANY assets/scripts outside these folders will be IGNORED and will probably fail the build.
+            mkdir((fullPath + "/assets").toStdString().c_str(), 0755);
+            mkdir((fullPath + "/scripts").toStdString().c_str(), 0755);
 
             this->close();
             auto* mainWindow = new MainWindow();
@@ -77,6 +93,31 @@ namespace SierraEditor::UI {
 
             QString fullPath = mPathInput->text() + "\\" + mNameInput->text();
             _mkdir(fullPath.toStdString().c_str());
+
+            QFile file(fullPath + "\\" + mNameInput->text() + ".sierra");
+            if (file.open(QIODevice::WriteOnly)) {
+                QTextStream stream(&file);
+                stream << "<SierraProject>\n";
+                stream << "    <Version>1</Version>\n";
+                stream << "    <Name>" << mNameInput->text() << "</Name>\n";
+                stream << "    <Directories>\n";
+                stream << "        <Assets>assets\\</Assets>\n"; /* Or .\\assets\\ */
+                stream << "        <Scripts>scripts\\</Scripts>\n";
+                stream << "    </Directories>\n";
+                stream << "    <Metadata>\n";
+                stream << "        <Created>" << QDate::currentDate().toString(Qt::ISODate) << "</Created>\n";
+                stream << "        <Modified>" << QDate::currentDate().toString(Qt::ISODate) << "</Modified>\n";
+                stream << "    </Metadata>\n";
+                stream << "    <Preferences>\n";
+                stream << "        <LastOpenedScene></LastOpenedScene>\n";
+                stream << "    </Preferences>\n";
+                stream << "</SierraProject>\n";
+                file.close();
+            }
+
+            _mkdir((fullPath + "\\assets").toStdString().c_str());
+            _mkdir((fullPath + "\\scripts").toStdString().c_str());
+
             this->close();
             auto* mainWindow = new MainWindow();
             mainWindow->show();

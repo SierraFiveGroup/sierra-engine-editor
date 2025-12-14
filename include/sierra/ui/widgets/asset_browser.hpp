@@ -4,7 +4,8 @@
 #pragma once
 
 #include <QWidget>
-#include <QTreeWidget>
+#include <QTreeView>
+#include <QFileSystemModel>
 #include <QVBoxLayout>
 
 namespace SierraEditor::UI {
@@ -14,7 +15,8 @@ namespace SierraEditor::UI {
             explicit AssetBrowser(QWidget* parent = nullptr);
     
         private:
-            QTreeWidget* mTree;
+            QTreeView* mTree;
+            QFileSystemModel* mFileSystemModel;
     
     };
 }

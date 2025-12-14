@@ -9,6 +9,8 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions>
 
+#include <string>
+
 #ifndef STB_EASY_FONT_IMPLEMENTATION
 #define STB_EASY_FONT_IMPLEMENTATION
 #endif
@@ -19,20 +21,26 @@ namespace SierraEditor::UI {
     class RenderViewport : public QWidget {
         Q_OBJECT
         public:
-            explicit RenderViewport(QWidget* parent = nullptr);
+            explicit RenderViewport(QWidget* parent = nullptr, std::string rendermsg = "No Project Loaded!");
+
+            void setRenderMessage(const std::string& msg) { mRenderMsg = msg; }
         
         private:
             QTabWidget* mTabs;
+            std::string mRenderMsg;
     };
     
     class BlueScreenGL : public QOpenGLWidget, protected QOpenGLFunctions {
         Q_OBJECT
         public:
-            explicit BlueScreenGL(QWidget* parent = nullptr);
+            explicit BlueScreenGL(QWidget* parent = nullptr, std::string* rendermsgPtr = nullptr);
         
         protected:
             void initializeGL() override;
             void paintGL() override;
             void resizeGL(int w, int h) override;
+
+        private:
+            std::string* mRenderMsgPtr = nullptr;
     };    
 }

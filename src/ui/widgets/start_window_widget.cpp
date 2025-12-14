@@ -13,7 +13,7 @@ namespace SierraEditor::UI {
         mWelcomeLabel = new QLabel("Welcome to Sierra Engine Editor! (devnote: press any button to open main window)", this);
         
         mNewProjectButton = new QPushButton("New Project", this);
-        mOpenProjectButton = new QPushButton("Open Project", this);
+        mOpenProjectButton = new QPushButton("Open Editor", this); // TODO: Change to Open Project dialog
 
         // Hook method to open main window on button click
         connect(mNewProjectButton, &QPushButton::clicked, [this]() {

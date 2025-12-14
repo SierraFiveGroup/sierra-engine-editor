@@ -2,21 +2,28 @@
 // Licensed under LGPLv2
 
 #include <sierra/ui/widgets/asset_browser.hpp>
+#include <QDir>
 
 namespace SierraEditor::UI {
     AssetBrowser::AssetBrowser(QWidget* parent)
         : QWidget(parent)
     {
-        mTree = new QTreeWidget(this);
-        mTree->setHeaderLabel("Assets");
+        mFileSystemModel = new QFileSystemModel(this);
+        
+        // Set root path to user's home directory
+        QString homePath = QDir::homePath();
+        mFileSystemModel->setRootPath(homePath);
 
-        // Placeholders
-        auto* root = new QTreeWidgetItem(mTree, QStringList() << "Root");
-        new QTreeWidgetItem(root, QStringList() << "Camera");
-        new QTreeWidgetItem(root, QStringList() << "GameObject");
-        new QTreeWidgetItem(root, QStringList() << "GameObject");
+        mTree = new QTreeView(this);
+        mTree->setModel(mFileSystemModel);
+        
+        // Set initial root index to home directory
+        mTree->setRootIndex(mFileSystemModel->index(homePath));
 
-        mTree->expandAll();
+        // Hide columns except name
+        mTree->hideColumn(1); // Size
+        mTree->hideColumn(2); // Type
+        mTree->hideColumn(3); // Date modified
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->addWidget(mTree);

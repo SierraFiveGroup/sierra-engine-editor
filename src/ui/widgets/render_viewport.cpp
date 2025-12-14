@@ -4,14 +4,14 @@
 #include <sierra/ui/widgets/render_viewport.hpp>
 
 namespace SierraEditor::UI {
-    RenderViewport::RenderViewport(QWidget* parent)
-        : QWidget(parent)
+    RenderViewport::RenderViewport(QWidget* parent, std::string rendermsg)
+        : QWidget(parent), mRenderMsg(rendermsg)
     {
         mTabs = new QTabWidget(this);
 
         // Create two OpenGL panels for Scene and Game views
-        auto* sceneView = new BlueScreenGL();
-        auto* gameView  = new BlueScreenGL();
+        auto* sceneView = new BlueScreenGL(nullptr, &mRenderMsg);
+        auto* gameView  = new BlueScreenGL(nullptr, &mRenderMsg);
 
         mTabs->addTab(sceneView, "Scene");
         mTabs->addTab(gameView, "Game");
@@ -24,8 +24,8 @@ namespace SierraEditor::UI {
 
     // ---- BlueScreenGL ----
 
-    BlueScreenGL::BlueScreenGL(QWidget* parent)
-        : QOpenGLWidget(parent)
+    BlueScreenGL::BlueScreenGL(QWidget* parent, std::string* rendermsgPtr)
+        : QOpenGLWidget(parent), mRenderMsgPtr(rendermsgPtr)
     {}
 
     void BlueScreenGL::initializeGL() {
@@ -55,9 +55,12 @@ namespace SierraEditor::UI {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        char text[] = "No Scene Loaded!";
+        char* text = "Undefined Message";
+        if (mRenderMsgPtr) {
+            text = const_cast<char*>((*mRenderMsgPtr).c_str());
+        }
         static char buffer[99999];
-        int num_quads = stb_easy_font_print(x, y, text, NULL, buffer, sizeof(buffer));
+        int num_quads = stb_easy_font_print(x, y, const_cast<char*>(text), NULL, buffer, sizeof(buffer));
 
         glColor3f(1.f, 0.f, 0.f); // Red
         glEnableClientState(GL_VERTEX_ARRAY);

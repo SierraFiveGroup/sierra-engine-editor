@@ -27,6 +27,16 @@
 #endif
 #endif
 
+#ifndef TODO
+#if defined(WIN32) || defined(_WIN32)
+#define TODO(msg) \
+    std::cerr << "\033[32m(TODO) \033[0m" << ": " << msg << "\n"
+#else
+#define TODO(msg) \
+    std::cerr << "\033[32m(TODO) \033[0m" << __PRETTY_FUNCTION__  << ": " << msg << "\n"
+#endif
+
+#endif
 #ifndef ERROR
 #if defined(WIN32) || defined(_WIN32)
 #define ERROR(msg) \
