@@ -81,4 +81,32 @@ namespace SierraEditor::IO {
         return splitString(path, '/');
 #endif
     }
+
+    static inline std::string stripLastPathComponent(const std::string& path) {
+        auto components = splitPath(path);
+        if (components.size() <= 1) {
+            return "";
+        }
+
+        components.pop_back();
+#ifdef _WIN32
+        std::string result;
+        for (size_t i = 0; i < components.size(); ++i) {
+            result += components[i];
+            if (i < components.size() - 1) {
+                result += '\\';
+            }
+        }
+        return result;
+#else
+        std::string result;
+        for (size_t i = 0; i < components.size(); ++i) {
+            result += components[i];
+            if (i < components.size() - 1) {
+                result += '/';
+            }
+        }
+        return result;
+#endif
+    }
 }

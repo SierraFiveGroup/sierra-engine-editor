@@ -30,4 +30,11 @@ namespace SierraEditor::UI {
         layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
     }
+
+    void AssetBrowser::setDirectory(const QString& path) {
+        QModelIndex index = mFileSystemModel->index(path);
+        if (index.isValid()) {
+            mTree->setRootIndex(index);
+        }
+    }
 }

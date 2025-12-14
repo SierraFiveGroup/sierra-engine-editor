@@ -37,11 +37,17 @@ namespace SierraEditor::UI {
 
                 if (mCurrentProject->load()) {
                     LOG("Loaded project: " << mCurrentProject->getName() << " (Version " << mCurrentProject->getVersion() << ")");
+                    LOG("Project path: " << mCurrentProject->getFilePath());
+
                     this->setWindowTitle(QString::fromStdString("Sierra Engine Editor - " + mCurrentProject->getName()));
                     mViewport->setRenderMessage("No Scene Loaded!");
+
                     mGenericLeft->addNewTab(new HierarchyPanel(), "Hierarchy");
                     mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
-                    mGenericBottom->addNewTab(new AssetBrowser(), "Asset Browser");
+                    auto* assetBrowser = new AssetBrowser();
+                    // Remove the last part of the file path to get the project directory
+                    assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
+                    mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
                 } else {
                     ERROR("Failed to load project at: " << dir.toStdString());
                 }
