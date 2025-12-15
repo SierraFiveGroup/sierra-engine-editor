@@ -1,0 +1,26 @@
+Definitions:
+"Files" refers to every file and diretory (and their contents / subdirectories) located in the same directory as this NOTICE.txt file.
+"LGPL v2.1" refers to the GNU Lesser General Public License, version 2.1.
+"Sierra Engine" and "Sierra Engine ecosystem" refer to the software development platform created by SierraFive / SierraFive Group (and its contributors), including but not limited to the Sierra Engine and Sierra Engine Editor.
+
+Notice:
+Files in this directory are NOT licensed under the LGPL v2.1.
+
+Copyright:
+They are the copyrighted work of their respective authors, who may be individuals or corporations.
+
+Warranty:
+These Files are provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and noninfringement. In no event shall the authors or copyright holders be liable for any claim, damages or other liability, whether in an action of contract, tort or otherwise, arising from, out of or in connection with the Files or the use or other dealings in the Files.
+
+Your rights:
+You may use, copy and redistribute the Files, provided that you do not remove this notice, and that you are using them for the SOLE PURPOSE of developing applications to run with Sierra Engine (and the broader Sierra Engine ecosystem). You may NOT use, copy or redistribute the Files if you are using them for any other purpose, including but not limited to developing applications that run with game engines other than Sierra Engine, without prior written permission from the copyright holders.
+Any rights not expressly granted herein are reserved by the copyright holders.
+
+Miscellaneous:
+This notice may ONLY be modified with prior written permission from the copyright holders of these Files.
+You may NOT contribute to the development of these Files unless authorized by the copyright holders of these Files.
+Note that this notice does NOT affect your rights granted under the LGPL v2.1 for any other files located in the broader Sierra Engine Editor repository, outside of this directory.
+
+Copyright SierraFive Group 2025, All Rights Reserved.
+
+For more information, please visit https://sierrafive.net/legal/
