@@ -27,7 +27,7 @@ namespace SierraEditor::Project {
 
     class SProject {
         public:
-            SProject(const std::string& filepath);
+            SProject(const std::string& filepath = "");
 
             bool load();
             bool save();

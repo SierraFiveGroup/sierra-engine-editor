@@ -6,10 +6,10 @@
 #include <sierra/io/io_utils.hpp>
 
 namespace SierraEditor::UI {
-    MainWindow::MainWindow(QWidget* parent)
+    MainWindow::MainWindow(const char* projectPath, QWidget* parent)
         : QMainWindow(parent)
     {
-        mCurrentProject = std::make_shared<Project::SProject>(""); // Empty path for now
+        mCurrentProject = std::make_shared<Project::SProject>(projectPath ? std::string(projectPath) : "");
         this->setWindowTitle("Sierra Engine Editor");
         mSetupMenus();
 
@@ -25,7 +25,7 @@ namespace SierraEditor::UI {
     void MainWindow::mSetupMenus() {
         // Actions
         QAction* openProjectAction = new QAction("Open Project", this);
-        openProjectAction->setShortcut(QKeySequence(SUPER_KEY | Qt::Key_O));
+        openProjectAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_O)); // Auto-adjusts to CMD on Mac
         connect(openProjectAction, &QAction::triggered, this, [this]() {
             // Popup file dialog to open project
             QString dir = QFileDialog::getOpenFileName(this, tr("Select Project File"), QDir::homePath(), "All Files (*);;Sierra Project Files (*.sierra)", nullptr, QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
@@ -55,7 +55,18 @@ namespace SierraEditor::UI {
         });
 
         QAction* saveAllAction = new QAction("Save All", this);
-        //saveAllAction->setShortcut(QKeySequence(std::string(SUPER_KEY) + "+S"));
+        saveAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
+        connect(saveAllAction, &QAction::triggered, this, [this]() {
+            if (mCurrentProject->getVersion() != 0) {
+                if (mCurrentProject->save()) {
+                    LOG("Project saved: " << mCurrentProject->getName());
+                } else {
+                    ERROR("Failed to save project: " << mCurrentProject->getName());
+                }
+            } else {
+                WARN("No project loaded; cannot save.");
+            }
+        });
 
         QAction* exitAction = new QAction("Exit", this);
         //exitAction->setShortcut(QKeySequence(std::string(SUPER_KEY) + "+Q"));

@@ -8,6 +8,8 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QObject>
+#include <QFont>
+#include <QSpacerItem>
 
 namespace SierraEditor::UI {
     class StartWindowWidget : public QWidget {
@@ -16,6 +18,7 @@ namespace SierraEditor::UI {
             explicit StartWindowWidget(QWidget* parent = nullptr);
     
         private:
+            QLabel* mTitleLabel;
             QLabel* mWelcomeLabel;
             QPushButton* mNewProjectButton;
             QPushButton* mOpenProjectButton;

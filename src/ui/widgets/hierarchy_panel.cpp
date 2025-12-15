@@ -11,10 +11,11 @@ namespace SierraEditor::UI {
         mTree->setHeaderLabel("Scene Objects");
 
         // Placeholders
-        auto* root = new QTreeWidgetItem(mTree, QStringList() << "Root");
-        new QTreeWidgetItem(root, QStringList() << "Camera");
-        new QTreeWidgetItem(root, QStringList() << "GameObject");
-        new QTreeWidgetItem(root, QStringList() << "GameObject");
+        auto* root = new QTreeWidgetItem(mTree, QStringList() << "<No Scene Loaded>");
+        //auto* root = new QTreeWidgetItem(mTree, QStringList() << "Root");
+        //new QTreeWidgetItem(root, QStringList() << "Camera");
+        //new QTreeWidgetItem(root, QStringList() << "GameObject");
+        //new QTreeWidgetItem(root, QStringList() << "GameObject");
 
         mTree->expandAll();
 

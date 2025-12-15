@@ -86,7 +86,7 @@ namespace SierraEditor::UI {
             mkdir((fullPath + "/scripts").toStdString().c_str(), 0755);
 
             this->close();
-            auto* mainWindow = new MainWindow();
+            auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "/" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);
             mainWindow->show();
 
             #else
@@ -119,7 +119,7 @@ namespace SierraEditor::UI {
             _mkdir((fullPath + "\\scripts").toStdString().c_str());
 
             this->close();
-            auto* mainWindow = new MainWindow();
+            auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "\\" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);
             mainWindow->show();
 
             #endif

@@ -28,15 +28,9 @@ namespace SierraEditor::UI {
     class MainWindow : public QMainWindow {
         Q_OBJECT
         public:
-            explicit MainWindow(QWidget* parent = nullptr);
+            explicit MainWindow(const char* projectPath, QWidget* parent = nullptr);
         
         private:
-            #if defined(__APPLE__)
-            constexpr static const uint32_t SUPER_KEY = Qt::META; // Entries are 32-bit
-            #else
-            constexpr static const uint32_t SUPER_KEY = Qt::CTRL;
-            #endif
-
             void mSetupDockPanels();
             void mSetupMenus();
 

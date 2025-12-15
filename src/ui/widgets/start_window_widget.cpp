@@ -10,7 +10,14 @@ namespace SierraEditor::UI {
         : QWidget(parent)
     {
         this->setWindowTitle("Start Window");
-        mWelcomeLabel = new QLabel("Welcome to Sierra Engine Editor! (devnote: press any button to open main window)", this);
+        this->setMinimumWidth(500);
+
+        QFont titleFont("Sans Serif", 24, QFont::Bold);
+        mTitleLabel = new QLabel("Sierra Engine Editor", this);
+        mTitleLabel->setFont(titleFont);
+
+        QSpacerItem* titleSpacer = new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        mWelcomeLabel = new QLabel("Welcome to the Sierra Engine Editor!", this);
         
         mNewProjectButton = new QPushButton("New Project", this);
         mOpenProjectButton = new QPushButton("Open Editor", this); // TODO: Change to Open Project dialog
@@ -24,11 +31,13 @@ namespace SierraEditor::UI {
 
         connect(mOpenProjectButton, &QPushButton::clicked, [this]() {
             this->close();
-            auto* mainWindow = new MainWindow();
+            auto* mainWindow = new MainWindow("", nullptr);
             mainWindow->show();
         });
 
         QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->addWidget(mTitleLabel);
+        layout->addItem(titleSpacer);
         layout->addWidget(mWelcomeLabel);
         layout->addWidget(mNewProjectButton);
         layout->addWidget(mOpenProjectButton);
