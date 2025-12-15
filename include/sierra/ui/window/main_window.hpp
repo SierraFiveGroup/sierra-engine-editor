@@ -21,6 +21,7 @@
 #include <sierra/ui/widgets/generic_panel.hpp>
 #include <sierra/project/sproject.hpp>
 #include <unordered_map>
+#include <unordered_set>
 #include <memory>
 #include <string>
 
@@ -33,8 +34,10 @@ namespace SierraEditor::UI {
         private:
             void mSetupDockPanels();
             void mSetupMenus();
+            void mSpawnGenericPanelWWithWidget(const std::string& panelName, QWidget* widgetToAdd);
+            void mRemoveFromActiveGenerics(const std::string& panelName);
 
-            std::unordered_map<std::string, QDockWidget*> mActiveWidgets;
+            std::unordered_map<std::string, GenericPanel*> mActiveGenerics;
             std::shared_ptr<Project::SProject> mCurrentProject;
     
             RenderViewport* mViewport;

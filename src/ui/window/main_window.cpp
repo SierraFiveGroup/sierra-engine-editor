@@ -73,16 +73,23 @@ namespace SierraEditor::UI {
         connect(exitAction, &QAction::triggered, this, &MainWindow::close);
 
         QAction* spawnHierarchyAction = new QAction("Hierarchy", this);
-        /*connect(spawnHierarchyAction, &QAction::triggered, this, []() {
-        });*/
+        spawnHierarchyAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_H));
+        // Connect to spawn new Hierarchy panel
+        connect(spawnHierarchyAction, &QAction::triggered, this, [this]() {
+            mSpawnGenericPanelWWithWidget("Hierarchy", new HierarchyPanel());
+        });
 
         QAction* spawnInspectorAction = new QAction("Inspector", this);
-        //connect(spawnInspectorAction, &QAction::triggered, this, []() {
-        //});
+        spawnInspectorAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_I));
+        connect(spawnInspectorAction, &QAction::triggered, this, [this]() {
+            mSpawnGenericPanelWWithWidget("Inspector", new InspectorPanel());
+        });
 
         QAction* spawnAssetBrowserAction = new QAction("Asset Browser", this);
-        //connect(spawnAssetBrowserAction, &QAction::triggered, this, []() {
-        //});
+        spawnAssetBrowserAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_A));
+        connect(spawnAssetBrowserAction, &QAction::triggered, this, [this]() {
+            mSpawnGenericPanelWWithWidget("Asset Browser", new AssetBrowser());
+        });
 
         // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
@@ -111,18 +118,50 @@ namespace SierraEditor::UI {
         auto* left = new QDockWidget(nullptr, this);
         mGenericLeft = new GenericPanel();
         left->setWidget(mGenericLeft);
+        mActiveGenerics["Hierarchy"] = mGenericLeft;
         addDockWidget(Qt::LeftDockWidgetArea, left);
 
         // Inspector
         auto* right = new QDockWidget(nullptr, this);
         mGenericRight = new GenericPanel();
         right->setWidget(mGenericRight);
+        mActiveGenerics["Inspector"] = mGenericRight;
         addDockWidget(Qt::RightDockWidgetArea, right);
 
         // Asset Browser
         auto* bottom = new QDockWidget(nullptr, this);
         mGenericBottom = new GenericPanel();
         bottom->setWidget(mGenericBottom);
+        mActiveGenerics["Asset Browser"] = mGenericBottom;
         addDockWidget(Qt::BottomDockWidgetArea, bottom);
+    }
+
+    void MainWindow::mSpawnGenericPanelWWithWidget(const std::string& panelName, QWidget* widgetToAdd) {
+        // Count existing panels in mActiveGenerics that match panelName
+        int count = 0;
+        for (const auto& pair : mActiveGenerics) {
+            if (pair.first == panelName) {
+                count++;
+            }
+        }
+
+        auto* newPanel = new GenericPanel();
+        newPanel->addNewTab(widgetToAdd, QString::fromStdString(panelName + (count > 0 ? " (" + std::to_string(count) + ")" : "")));
+        mActiveGenerics[panelName] = newPanel;
+
+        auto* dockWidget = new QDockWidget(nullptr, this);
+
+        connect(dockWidget, &QDockWidget::destroyed, this, [this, panelName]() {
+            mRemoveFromActiveGenerics(panelName);
+        });
+
+        dockWidget->setWidget(newPanel);
+        // Don't auto-dock; let the user place it
+        dockWidget->setFloating(true);
+        dockWidget->show();
+    }
+
+    void MainWindow::mRemoveFromActiveGenerics(const std::string& panelName) {
+        mActiveGenerics.erase(panelName);
     }
 }
