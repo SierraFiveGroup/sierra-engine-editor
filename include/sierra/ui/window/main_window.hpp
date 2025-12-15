@@ -34,7 +34,7 @@ namespace SierraEditor::UI {
         private:
             void mSetupDockPanels();
             void mSetupMenus();
-            void mSpawnGenericPanelWWithWidget(const std::string& panelName, QWidget* widgetToAdd);
+            void mSpawnGenericPanelWithWidget(const std::string& panelName, QWidget* widgetToAdd);
             void mRemoveFromActiveGenerics(const std::string& panelName);
 
             std::unordered_map<std::string, GenericPanel*> mActiveGenerics;

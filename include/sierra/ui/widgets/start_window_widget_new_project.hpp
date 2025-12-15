@@ -15,6 +15,8 @@
 #include <QFile>
 #include <QIODevice>
 #include <QMessageBox>
+#include <QFont>
+#include <QSpacerItem>
 
 namespace SierraEditor::UI {
     class StartWindowWidgetNewProject : public QWidget {
@@ -23,6 +25,7 @@ namespace SierraEditor::UI {
             explicit StartWindowWidgetNewProject(QWidget* parent = nullptr);
     
         private:
+            QLabel* mTitleLabel;
             QLabel* mNameLabel;
             QLabel* mProjectPath;
             QLineEdit* mNameInput;

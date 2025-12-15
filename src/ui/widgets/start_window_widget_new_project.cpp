@@ -3,6 +3,7 @@
 
 #include <sierra/ui/widgets/start_window_widget_new_project.hpp>
 #include <sierra/ui/window/main_window.hpp>
+#include <sierra/logger.hpp>
 
 #if !defined(__WIN32__)
     #include <unistd.h>
@@ -18,6 +19,14 @@ namespace SierraEditor::UI {
         : QWidget(parent)
     {
         this->setWindowTitle("New Project");
+        this->setMinimumWidth(500);
+        
+        QFont titleFont("Sans Serif", 24, QFont::Bold);
+        mTitleLabel = new QLabel("New Project", this);
+        mTitleLabel->setFont(titleFont);
+
+        QSpacerItem* titleSpacer = new QSpacerItem(0, 10, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        
         mNameLabel = new QLabel("Project Name:", this);
 
         #if !defined(__WIN32__)
@@ -89,6 +98,8 @@ namespace SierraEditor::UI {
             auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "/" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);
             mainWindow->show();
 
+            TODO("Forwarding the user to the main window after project creation should auto-load the corresponding project.");
+
             #else
 
             QString fullPath = mPathInput->text() + "\\" + mNameInput->text();
@@ -122,10 +133,14 @@ namespace SierraEditor::UI {
             auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "\\" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);
             mainWindow->show();
 
+            TODO("Forwarding the user to the main window after project creation should auto-load the corresponding project.");
+            
             #endif
         });
 
         QVBoxLayout* layout = new QVBoxLayout(this);
+        layout->addWidget(mTitleLabel);
+        layout->addItem(titleSpacer);
         layout->addWidget(mNameLabel);
         layout->addWidget(mNameInput);
         layout->addWidget(mProjectPath);

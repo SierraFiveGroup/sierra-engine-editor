@@ -76,19 +76,19 @@ namespace SierraEditor::UI {
         spawnHierarchyAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_H));
         // Connect to spawn new Hierarchy panel
         connect(spawnHierarchyAction, &QAction::triggered, this, [this]() {
-            mSpawnGenericPanelWWithWidget("Hierarchy", new HierarchyPanel());
+            mSpawnGenericPanelWithWidget("Hierarchy", new HierarchyPanel());
         });
 
         QAction* spawnInspectorAction = new QAction("Inspector", this);
         spawnInspectorAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_I));
         connect(spawnInspectorAction, &QAction::triggered, this, [this]() {
-            mSpawnGenericPanelWWithWidget("Inspector", new InspectorPanel());
+            mSpawnGenericPanelWithWidget("Inspector", new InspectorPanel());
         });
 
         QAction* spawnAssetBrowserAction = new QAction("Asset Browser", this);
         spawnAssetBrowserAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_A));
         connect(spawnAssetBrowserAction, &QAction::triggered, this, [this]() {
-            mSpawnGenericPanelWWithWidget("Asset Browser", new AssetBrowser());
+            mSpawnGenericPanelWithWidget("Asset Browser", new AssetBrowser());
         });
 
         // Menus
@@ -136,7 +136,7 @@ namespace SierraEditor::UI {
         addDockWidget(Qt::BottomDockWidgetArea, bottom);
     }
 
-    void MainWindow::mSpawnGenericPanelWWithWidget(const std::string& panelName, QWidget* widgetToAdd) {
+    void MainWindow::mSpawnGenericPanelWithWidget(const std::string& panelName, QWidget* widgetToAdd) {
         // Count existing panels in mActiveGenerics that match panelName
         int count = 0;
         for (const auto& pair : mActiveGenerics) {
