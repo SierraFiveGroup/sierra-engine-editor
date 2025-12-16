@@ -22,6 +22,12 @@ namespace SierraEditor::UI {
             QWidget* w = tabs->widget(index);
             tabs->removeTab(index);
             if (w) w->deleteLater();
+
+            if (tabs->count() == 0) {
+                // Destroy this panel if no tabs remain, and destroy the parent dock widget as well
+                QWidget* p = this->parentWidget();
+                if (p) p->deleteLater();
+            }
         });
 
         auto* layout = new QVBoxLayout(this);

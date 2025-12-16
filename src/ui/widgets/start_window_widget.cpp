@@ -11,6 +11,7 @@ namespace SierraEditor::UI {
     {
         this->setWindowTitle("Start Window");
         this->setMinimumWidth(500);
+        //this->setMinimumHeight(200);
 
         QFont titleFont("Sans Serif", 24, QFont::Bold);
         mTitleLabel = new QLabel("Sierra Engine Editor", this);
@@ -21,6 +22,16 @@ namespace SierraEditor::UI {
         
         mNewProjectButton = new QPushButton("New Project", this);
         mOpenProjectButton = new QPushButton("Open Editor", this); // TODO: Change to Open Project dialog
+
+        /*mRecentProjectsList = new QListView(this);
+        mRecentProjectsList->setMinimumHeight(160);
+        mRecentProjectsList->setWindowTitle("Recent Projects");
+        
+        // Add some placeholder items
+        QListViewItem* item1 = new QListViewItem(mRecentProjectsList, "Project1.sierra");
+        QListViewItem* item2 = new QListViewItem(mRecentProjectsList, "Project2.sierra");
+        QListViewItem* item3 = new QListViewItem(mRecentProjectsList, "Project3.sierra");
+        QListViewItem* item4 = new QListViewItem(mRecentProjectsList, "Project4.sierra");*/
 
         // Hook method to open main window on button click
         connect(mNewProjectButton, &QPushButton::clicked, [this]() {
@@ -41,6 +52,7 @@ namespace SierraEditor::UI {
         layout->addWidget(mWelcomeLabel);
         layout->addWidget(mNewProjectButton);
         layout->addWidget(mOpenProjectButton);
+        // layout->addWidget(mRecentProjectsList);
         layout->setContentsMargins(10, 10, 10, 10);
         setLayout(layout);
     }

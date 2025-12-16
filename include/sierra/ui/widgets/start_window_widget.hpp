@@ -10,6 +10,8 @@
 #include <QObject>
 #include <QFont>
 #include <QSpacerItem>
+#include <QListView>
+//#include <QListViewItem>
 
 namespace SierraEditor::UI {
     class StartWindowWidget : public QWidget {
@@ -22,6 +24,8 @@ namespace SierraEditor::UI {
             QLabel* mWelcomeLabel;
             QPushButton* mNewProjectButton;
             QPushButton* mOpenProjectButton;
+
+            QListView* mRecentProjectsList;
     
     };
 }
