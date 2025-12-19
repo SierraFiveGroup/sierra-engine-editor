@@ -29,16 +29,27 @@ namespace SierraEditor::Viewport::GL {
         if (kb.isKeyPressed(Qt::Key_D))
             mPosition += mRight * velocity;
 
-        // simple vertical pan (arrow keys)
+        float rotationSpeed = 45.0f; // degrees per second
+        // Camera rotation in all axes (arrow keys) - generic implementation (move to mouse later)
+        float pitch = 0.0f;
+        float yaw = 0.0f;
         if (kb.isKeyPressed(Qt::Key_Up))
-            mPosition += mUp * velocity;
+            pitch += rotationSpeed * dt;
         if (kb.isKeyPressed(Qt::Key_Down))
-            mPosition -= mUp * velocity;
-
-        LOG("Camera position: (" + 
-            std::to_string(mPosition.x()) + ", " + 
-            std::to_string(mPosition.y()) + ", " + 
-            std::to_string(mPosition.z()) + ")");
+            pitch -= rotationSpeed * dt;
+        if (kb.isKeyPressed(Qt::Key_Left))
+            yaw += rotationSpeed * dt;
+        if (kb.isKeyPressed(Qt::Key_Right))
+            yaw -= rotationSpeed * dt;
+        
+        if (pitch != 0.0f || yaw != 0.0f) {
+            QMatrix4x4 rotation;
+            rotation.setToIdentity();
+            rotation.rotate(yaw, mUp);
+            rotation.rotate(pitch, mRight);
+            mForward = (rotation * QVector4D(mForward, 0.0f)).toVector3D().normalized();
+            mRight = QVector3D::crossProduct(mForward, mUp).normalized();
+        }
     }
 
     QMatrix4x4 Camera::view() const {
