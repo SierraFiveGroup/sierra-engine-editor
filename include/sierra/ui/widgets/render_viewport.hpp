@@ -1,5 +1,5 @@
 // render_viewport.hpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #pragma once
 

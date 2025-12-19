@@ -1,5 +1,5 @@
 // generic_panel.cpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/generic_panel.hpp>
 

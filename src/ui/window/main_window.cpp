@@ -1,5 +1,5 @@
 // main_window.cpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #include <sierra/ui/window/main_window.hpp>
 #include <sierra/logger.hpp>

@@ -1,5 +1,5 @@
 // main_window.hpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #pragma once
 
@@ -13,6 +13,7 @@
 #include <QString>
 #include <QFileDialog>
 #include <QDir>
+#include <QKeyEvent>
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -20,6 +21,7 @@
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/generic_panel.hpp>
 #include <sierra/project/sproject.hpp>
+#include <sierra/io/keyboard.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
@@ -44,5 +46,16 @@ namespace SierraEditor::UI {
             GenericPanel* mGenericLeft;
             GenericPanel* mGenericRight;
             GenericPanel* mGenericBottom;
+
+        protected:
+            void keyPressEvent(QKeyEvent* event) override {
+                IO::Keyboard::handleKeyPress(event);
+                QMainWindow::keyPressEvent(event);
+            }
+
+            void keyReleaseEvent(QKeyEvent* event) override {
+                IO::Keyboard::handleKeyRelease(event);
+                QMainWindow::keyReleaseEvent(event);
+            }
     };
 }

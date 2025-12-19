@@ -1,5 +1,5 @@
 // sproject.cpp - .sierra project file wrapper
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #include <rapidxml/rapidxml.hpp>
 #include <rapidxml/rapidxml_print.hpp>

@@ -1,5 +1,5 @@
 // start_window_widget.hpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #pragma once
 

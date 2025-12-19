@@ -1,5 +1,5 @@
 // start_window_widget_new_project.cpp
-// Licensed under LGPLv2
+// Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/start_window_widget_new_project.hpp>
 #include <sierra/ui/window/main_window.hpp>
