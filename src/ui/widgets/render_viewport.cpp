@@ -10,10 +10,11 @@ namespace SierraEditor::UI {
         mTabs = new QTabWidget(this);
 
         // Create two OpenGL panels for Scene and Game views
-        auto* sceneView = new BlueScreenGL(nullptr, &mRenderMsg);
+        //mSceneView = new BlueScreenGL(nullptr, &mRenderMsg);
+        mSceneView = new SierraEditor::Viewport::GL::ViewportGL(nullptr);
         auto* gameView  = new BlueScreenGL(nullptr, &mRenderMsg);
 
-        mTabs->addTab(sceneView, "Scene");
+        mTabs->addTab(mSceneView, "Scene");
         mTabs->addTab(gameView, "Game");
 
         QVBoxLayout* layout = new QVBoxLayout(this);

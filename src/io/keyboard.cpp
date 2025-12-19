@@ -15,13 +15,13 @@ namespace SierraEditor::IO {
     }
 
     void Keyboard::handleKeyPress(QKeyEvent* event) {
-        LOG("Holy shit a key got pressed!");
+        //LOG("Pressed key code: " + std::to_string(event->key()));
         std::lock_guard<std::mutex> lock(getInstance().mMutex);
         getInstance().mKeyStates[event->key()] = true;
     }
 
     void Keyboard::handleKeyRelease(QKeyEvent* event) {
-        LOG("Holy shit a key got released!");
+        //LOG("Released key code: " + std::to_string(event->key()));
         std::lock_guard<std::mutex> lock(getInstance().mMutex);
         getInstance().mKeyStates[event->key()] = false;
     }

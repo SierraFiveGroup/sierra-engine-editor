@@ -1,3 +1,6 @@
+// always_visible_tabwidget.hpp
+// Licensed under LGPLv2.1
+
 #pragma once
 
 #include <QTabBar>

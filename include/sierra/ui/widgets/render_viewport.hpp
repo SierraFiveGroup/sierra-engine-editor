@@ -15,6 +15,8 @@
 #define STB_EASY_FONT_IMPLEMENTATION
 #endif
 
+#include <sierra/viewport/gl/viewport_gl.hpp>
+
 #include <stb/stb_easy_font.h>
 
 namespace SierraEditor::UI {
@@ -28,6 +30,7 @@ namespace SierraEditor::UI {
         private:
             QTabWidget* mTabs;
             std::string mRenderMsg;
+            QOpenGLWidget* mSceneView = nullptr;
     };
     
     class BlueScreenGL : public QOpenGLWidget, protected QOpenGLFunctions {
@@ -42,5 +45,5 @@ namespace SierraEditor::UI {
 
         private:
             std::string* mRenderMsgPtr = nullptr;
-    };    
+    };
 }
