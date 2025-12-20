@@ -10,8 +10,7 @@ namespace SierraEditor::UI {
         mTabs = new QTabWidget(this);
 
         // Create two OpenGL panels for Scene and Game views
-        //mSceneView = new BlueScreenGL(nullptr, &mRenderMsg);
-        mSceneView = new SierraEditor::Viewport::GL::ViewportGL(nullptr);
+        mSceneView = new BlueScreenGL(nullptr, &mRenderMsg); // Default to blue screen
         auto* gameView  = new BlueScreenGL(nullptr, &mRenderMsg);
 
         mTabs->addTab(mSceneView, "Scene");
@@ -21,6 +20,19 @@ namespace SierraEditor::UI {
         layout->addWidget(mTabs);
         layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
+    }
+
+    void RenderViewport::switchToSceneView() {
+        if (mSceneView) {
+            mSceneView->deleteLater();
+        }
+
+        mSceneView = new SierraEditor::Viewport::GL::ViewportGL(nullptr);
+
+        // Swap tab
+        mTabs->removeTab(0);
+        mTabs->insertTab(0, mSceneView, "Scene");
+        mTabs->setCurrentIndex(0);
     }
 
     // ---- BlueScreenGL ----

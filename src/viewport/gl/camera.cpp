@@ -3,6 +3,9 @@
 
 #include <sierra/viewport/gl/camera.hpp>
 #include <sierra/logger.hpp>
+#include <sierra/consts.hpp>
+
+#include <cmath>
 
 namespace SierraEditor::Viewport::GL {
     Camera::Camera()
@@ -12,11 +15,54 @@ namespace SierraEditor::Viewport::GL {
         mUp(0.0f, 1.0f, 0.0f)
     {
         mRight = QVector3D::crossProduct(mForward, mUp).normalized();
+        mPrevMouseX = IO::Mouse::getInstance().getMouseX();
+        mPrevMouseY = IO::Mouse::getInstance().getMouseY();
+
+        // Initialize yaw/pitch from the starting forward vector
+        mYaw = RAD2DEG(std::atan2(mForward.z(), mForward.x()));
+        mPitch = RAD2DEG(std::asin(mForward.y()));
     }
 
     void Camera::update(float dt) {
         const auto& kb = IO::Keyboard::getInstance();
+        
+        if (IO::Mouse::getInstance().isButtonPressed(Qt::RightButton)) {
+            float currentMouseX = IO::Mouse::getInstance().getMouseX();
+            float currentMouseY = IO::Mouse::getInstance().getMouseY();
 
+            float deltaX = currentMouseX - mPrevMouseX;
+            float deltaY = currentMouseY - mPrevMouseY;
+
+            mYaw   -= -deltaX * mLookSensitivity;
+            mPitch += -deltaY * mLookSensitivity;
+            mPitch = std::clamp(mPitch, -89.0f, 89.0f); // avoid gimbal lock
+
+            mPrevMouseX = currentMouseX;
+            mPrevMouseY = currentMouseY;
+        } else {
+            // Reset previous mouse positions when right button is not pressed
+            mPrevMouseX = IO::Mouse::getInstance().getMouseX();
+            mPrevMouseY = IO::Mouse::getInstance().getMouseY();
+        }
+
+        // Recompute orientation from yaw/pitch to keep basis orthonormal
+        const float yawRad = DEG2RAD(mYaw);
+        const float pitchRad = DEG2RAD(mPitch);
+
+        mForward = QVector3D(
+            std::cos(pitchRad) * std::cos(yawRad),
+            std::sin(pitchRad),
+            std::cos(pitchRad) * std::sin(yawRad)
+        ).normalized();
+
+        const QVector3D worldUp(0.0f, 1.0f, 0.0f);
+        QVector3D right = QVector3D::crossProduct(mForward, worldUp);
+        if (right.lengthSquared() > 1e-6f) {
+            mRight = right.normalized();
+        }
+        mUp = QVector3D::crossProduct(mRight, mForward).normalized();
+
+        // Movement using the refreshed basis vectors
         float velocity = mMoveSpeed * dt;
 
         if (kb.isKeyPressed(Qt::Key_W))
@@ -28,28 +74,6 @@ namespace SierraEditor::Viewport::GL {
             mPosition -= mRight * velocity;
         if (kb.isKeyPressed(Qt::Key_D))
             mPosition += mRight * velocity;
-
-        float rotationSpeed = 45.0f; // degrees per second
-        // Camera rotation in all axes (arrow keys) - generic implementation (move to mouse later)
-        float pitch = 0.0f;
-        float yaw = 0.0f;
-        if (kb.isKeyPressed(Qt::Key_Up))
-            pitch += rotationSpeed * dt;
-        if (kb.isKeyPressed(Qt::Key_Down))
-            pitch -= rotationSpeed * dt;
-        if (kb.isKeyPressed(Qt::Key_Left))
-            yaw += rotationSpeed * dt;
-        if (kb.isKeyPressed(Qt::Key_Right))
-            yaw -= rotationSpeed * dt;
-        
-        if (pitch != 0.0f || yaw != 0.0f) {
-            QMatrix4x4 rotation;
-            rotation.setToIdentity();
-            rotation.rotate(yaw, mUp);
-            rotation.rotate(pitch, mRight);
-            mForward = (rotation * QVector4D(mForward, 0.0f)).toVector3D().normalized();
-            mRight = QVector3D::crossProduct(mForward, mUp).normalized();
-        }
     }
 
     QMatrix4x4 Camera::view() const {

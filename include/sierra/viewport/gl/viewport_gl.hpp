@@ -15,12 +15,19 @@
 #include <sierra/viewport/gl/camera.hpp>
 #include <sierra/viewport/gl/mesh.hpp>
 
+#ifndef STB_EASY_FONT_IMPLEMENTATION
+#define STB_EASY_FONT_IMPLEMENTATION
+#endif
+
+#include <stb/stb_easy_font.h>
+
 namespace SierraEditor::Viewport::GL {
     class ViewportGL final : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core {
         Q_OBJECT
         public:
             explicit ViewportGL(QWidget* parent = nullptr) : QOpenGLWidget(parent) {
-                setFocusPolicy(Qt::StrongFocus);
+                // Set focus policy to only accept when clicked into viewport
+                setFocusPolicy(Qt::ClickFocus);
 
                 mFrameTick.setInterval(16); // ~60 Hz
                 connect(&mFrameTick, &QTimer::timeout, this, QOverload<>::of(&ViewportGL::update));
@@ -29,9 +36,7 @@ namespace SierraEditor::Viewport::GL {
         
         protected:
             void initializeGL() override;
-
             void resizeGL(int w, int h) override;
-
             void paintGL() override;
 
         private:

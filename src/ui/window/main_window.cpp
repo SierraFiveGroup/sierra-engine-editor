@@ -48,6 +48,8 @@ namespace SierraEditor::UI {
                     // Remove the last part of the file path to get the project directory
                     assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
                     mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
+
+                    mViewport->switchToSceneView();
                 } else {
                     ERROR("Failed to load project at: " << dir.toStdString());
                 }

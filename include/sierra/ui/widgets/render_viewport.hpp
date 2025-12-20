@@ -26,6 +26,9 @@ namespace SierraEditor::UI {
             explicit RenderViewport(QWidget* parent = nullptr, std::string rendermsg = "No Project Loaded!");
 
             void setRenderMessage(const std::string& msg) { mRenderMsg = msg; }
+
+            // Switch from the default BlueScreenGL to the actual Scene View
+            void switchToSceneView();
         
         private:
             QTabWidget* mTabs;

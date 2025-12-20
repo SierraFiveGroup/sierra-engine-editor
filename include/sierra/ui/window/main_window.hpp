@@ -14,6 +14,7 @@
 #include <QFileDialog>
 #include <QDir>
 #include <QKeyEvent>
+#include <QMouseEvent>
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -22,6 +23,7 @@
 #include <sierra/ui/widgets/generic_panel.hpp>
 #include <sierra/project/sproject.hpp>
 #include <sierra/io/keyboard.hpp>
+#include <sierra/io/mouse.hpp>
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
@@ -56,6 +58,21 @@ namespace SierraEditor::UI {
             void keyReleaseEvent(QKeyEvent* event) override {
                 IO::Keyboard::handleKeyRelease(event);
                 QMainWindow::keyReleaseEvent(event);
+            }
+
+            void mousePressEvent(QMouseEvent* event) override {
+                IO::Mouse::handleButtonPress(event);
+                QMainWindow::mousePressEvent(event);
+            }
+
+            void mouseReleaseEvent(QMouseEvent* event) override {
+                IO::Mouse::handleButtonRelease(event);
+                QMainWindow::mouseReleaseEvent(event);
+            }
+
+            void mouseMoveEvent(QMouseEvent* event) override {
+                IO::Mouse::handleMouseMove(event);
+                QMainWindow::mouseMoveEvent(event);
             }
     };
 }

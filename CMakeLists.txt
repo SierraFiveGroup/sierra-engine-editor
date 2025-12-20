@@ -31,6 +31,10 @@ file(GLOB_RECURSE PROJECT_SOURCES
     "${INC_DIR}/*.hpp"
 )
 
+# Get GLM
+find_package(glm REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+
 # ---- Executable ----
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
@@ -49,6 +53,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Gui
         Qt6::Widgets
         Qt6::OpenGLWidgets
+        glm::glm
 )
 
 # ---- Platform-Specific Settings ----
