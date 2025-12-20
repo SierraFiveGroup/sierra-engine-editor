@@ -20,6 +20,15 @@ namespace SierraEditor::UI {
         mSetupDockPanels();
 
         resize(1600, 900);
+
+        if (projectPath && std::string(projectPath) != "") {
+            if (!IO::fileExists(projectPath)) {
+                WARN("Project file does not exist at path: " << projectPath << "; starting with no project loaded.");
+                return;
+            }
+
+            openProject(QString::fromStdString(std::string(projectPath)));
+        }
     }
 
     void MainWindow::mSetupMenus() {
@@ -113,6 +122,14 @@ namespace SierraEditor::UI {
         windowMenu->addAction(spawnHierarchyAction);
         windowMenu->addAction(spawnInspectorAction);
         windowMenu->addAction(spawnAssetBrowserAction);
+
+        QMenu* viewMenu = menuBar()->addMenu("View");
+        QAction* toggleGridAction = new QAction("Toggle Grid", this);
+        toggleGridAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
+        connect(toggleGridAction, &QAction::triggered, this, [this]() {
+            mViewport->toggleGridView();
+        });
+        viewMenu->addAction(toggleGridAction);
     }
 
     void MainWindow::mSetupDockPanels() {
@@ -165,5 +182,31 @@ namespace SierraEditor::UI {
 
     void MainWindow::mRemoveFromActiveGenerics(const std::string& panelName) {
         mActiveGenerics.erase(panelName);
+    }
+
+    void MainWindow::openProject(const QString& projectPath) {
+        if (!mCurrentProject->overrideFilePath(projectPath.toStdString())) {
+            TODO("Project is already loaded; cannot override file path; ADD SUPPORT FOR SWITCHING PROJECTS");
+            return; // TODO: Save current project and load new one
+        }
+
+        if (mCurrentProject->load()) {
+            LOG("Loaded project: " << mCurrentProject->getName() << " (Version " << mCurrentProject->getVersion() << ")");
+            LOG("Project path: " << mCurrentProject->getFilePath());
+
+            this->setWindowTitle(QString::fromStdString("Sierra Engine Editor - " + mCurrentProject->getName()));
+            mViewport->setRenderMessage("No Scene Loaded!");
+
+            mGenericLeft->addNewTab(new HierarchyPanel(), "Hierarchy");
+            mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
+            auto* assetBrowser = new AssetBrowser();
+            // Remove the last part of the file path to get the project directory
+            assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
+            mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
+
+            mViewport->switchToSceneView();
+        } else {
+            ERROR("Failed to load project at: " << projectPath.toStdString());
+        }
     }
 }

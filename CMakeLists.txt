@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.21)
+cmake_minimum_required(VERSION 4.0)
 
 # ---- Project ----
 project(SierraEngineEditor
@@ -21,6 +21,9 @@ set(CMAKE_AUTORCC ON)
 # Find Qt6
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets OpenGLWidgets)
 
+# FetchContent utilities
+include(FetchContent)
+
 # ---- Source / Include directories ----
 set(SRC_DIR "${CMAKE_SOURCE_DIR}/src")
 set(INC_DIR "${CMAKE_SOURCE_DIR}/include")
@@ -34,6 +37,15 @@ file(GLOB_RECURSE PROJECT_SOURCES
 # Get GLM
 find_package(glm REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
+
+# Fetch cxxopts
+FetchContent_Declare(
+    cxxopts
+    GIT_REPOSITORY https://github.com/jarro2783/cxxopts.git
+    GIT_TAG v3.3.1
+)
+
+FetchContent_MakeAvailable(cxxopts)
 
 # ---- Executable ----
 add_executable(${PROJECT_NAME}
@@ -54,6 +66,7 @@ target_link_libraries(${PROJECT_NAME}
         Qt6::Widgets
         Qt6::OpenGLWidgets
         glm::glm
+        cxxopts::cxxopts
 )
 
 # ---- Platform-Specific Settings ----

@@ -34,7 +34,8 @@ namespace SierraEditor::UI {
         Q_OBJECT
         public:
             explicit MainWindow(const char* projectPath, QWidget* parent = nullptr);
-        
+            void openProject(const QString& projectPath);
+
         private:
             void mSetupDockPanels();
             void mSetupMenus();

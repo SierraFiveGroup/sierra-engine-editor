@@ -29,6 +29,9 @@ namespace SierraEditor::UI {
 
             // Switch from the default BlueScreenGL to the actual Scene View
             void switchToSceneView();
+
+            // Toggle grid view (only in non-blue screen mode)
+            void toggleGridView();
         
         private:
             QTabWidget* mTabs;

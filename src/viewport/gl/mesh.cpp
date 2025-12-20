@@ -4,26 +4,26 @@
 #include <sierra/viewport/gl/mesh.hpp>
 
 namespace SierraEditor::Viewport::GL {
-    // Simple cube data
+    // Simple cube data with positions and colors (pos XYZ, color RGB)
     static const float cubeVertices[] = {
         // Front
-        -1,-1, 1,   1,-1, 1,   1, 1, 1,
-        -1,-1, 1,   1, 1, 1,  -1, 1, 1,
+        -1,-1, 1,  0.8f, 0.8f, 0.8f,    1,-1, 1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,
+        -1,-1, 1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,   -1, 1, 1,  0.8f, 0.8f, 0.8f,
         // Back
-        -1,-1,-1,  -1, 1,-1,   1, 1,-1,
-        -1,-1,-1,   1, 1,-1,   1,-1,-1,
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,   -1, 1,-1,  0.8f, 0.8f, 0.8f,    1, 1,-1,  0.8f, 0.8f, 0.8f,
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,    1, 1,-1,  0.8f, 0.8f, 0.8f,    1,-1,-1,  0.8f, 0.8f, 0.8f,
         // Left
-        -1,-1,-1,  -1,-1, 1,  -1, 1, 1,
-        -1,-1,-1,  -1, 1, 1,  -1, 1,-1,
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,   -1,-1, 1,  0.8f, 0.8f, 0.8f,   -1, 1, 1,  0.8f, 0.8f, 0.8f,
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,   -1, 1, 1,  0.8f, 0.8f, 0.8f,   -1, 1,-1,  0.8f, 0.8f, 0.8f,
         // Right
-         1,-1,-1,   1, 1,-1,   1, 1, 1,
-         1,-1,-1,   1, 1, 1,   1,-1, 1,
+         1,-1,-1,  0.8f, 0.8f, 0.8f,    1, 1,-1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,
+         1,-1,-1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,    1,-1, 1,  0.8f, 0.8f, 0.8f,
         // Top
-        -1, 1,-1,  -1, 1, 1,   1, 1, 1,
-        -1, 1,-1,   1, 1, 1,   1, 1,-1,
+        -1, 1,-1,  0.8f, 0.8f, 0.8f,   -1, 1, 1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,
+        -1, 1,-1,  0.8f, 0.8f, 0.8f,    1, 1, 1,  0.8f, 0.8f, 0.8f,    1, 1,-1,  0.8f, 0.8f, 0.8f,
         // Bottom
-        -1,-1,-1,   1,-1,-1,   1,-1, 1,
-        -1,-1,-1,   1,-1, 1,  -1,-1, 1
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,    1,-1,-1,  0.8f, 0.8f, 0.8f,    1,-1, 1,  0.8f, 0.8f, 0.8f,
+        -1,-1,-1,  0.8f, 0.8f, 0.8f,    1,-1, 1,  0.8f, 0.8f, 0.8f,   -1,-1, 1,  0.8f, 0.8f, 0.8f
     };
 
     Mesh::Mesh(QOpenGLFunctions_4_5_Core* gl)
@@ -36,7 +36,7 @@ namespace SierraEditor::Viewport::GL {
     }
 
     void Mesh::create() {
-        mVertexCount = sizeof(cubeVertices) / (3 * sizeof(float));
+        mVertexCount = sizeof(cubeVertices) / (6 * sizeof(float));
 
         mGL->glGenVertexArrays(1, &mVAO);
         mGL->glGenBuffers(1, &mVBO);
@@ -50,11 +50,20 @@ namespace SierraEditor::Viewport::GL {
             GL_STATIC_DRAW
         );
 
+        // Position attribute
         mGL->glEnableVertexAttribArray(0);
         mGL->glVertexAttribPointer(
             0, 3, GL_FLOAT, GL_FALSE,
-            3 * sizeof(float),
+            6 * sizeof(float),
             nullptr
+        );
+
+        // Color attribute
+        mGL->glEnableVertexAttribArray(1);
+        mGL->glVertexAttribPointer(
+            1, 3, GL_FLOAT, GL_FALSE,
+            6 * sizeof(float),
+            (void*)(3 * sizeof(float))
         );
 
         mGL->glBindVertexArray(0);

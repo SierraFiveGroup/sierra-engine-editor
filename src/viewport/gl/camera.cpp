@@ -3,7 +3,7 @@
 
 #include <sierra/viewport/gl/camera.hpp>
 #include <sierra/logger.hpp>
-#include <sierra/consts.hpp>
+#include <sierra/utils.hpp>
 
 #include <cmath>
 
@@ -25,6 +25,13 @@ namespace SierraEditor::Viewport::GL {
 
     void Camera::update(float dt) {
         const auto& kb = IO::Keyboard::getInstance();
+
+        if (kb.isKeyPressed(Qt::Key_Shift)) {
+            mMoveSpeed = 15.0f;
+        } else {
+            mMoveSpeed = 5.0f;
+        }
+
         
         if (IO::Mouse::getInstance().isButtonPressed(Qt::RightButton)) {
             float currentMouseX = IO::Mouse::getInstance().getMouseX();

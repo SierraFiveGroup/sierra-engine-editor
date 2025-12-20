@@ -14,6 +14,7 @@
 
 #include <sierra/viewport/gl/camera.hpp>
 #include <sierra/viewport/gl/mesh.hpp>
+#include <sierra/logger.hpp>
 
 #ifndef STB_EASY_FONT_IMPLEMENTATION
 #define STB_EASY_FONT_IMPLEMENTATION
@@ -32,6 +33,16 @@ namespace SierraEditor::Viewport::GL {
                 mFrameTick.setInterval(16); // ~60 Hz
                 connect(&mFrameTick, &QTimer::timeout, this, QOverload<>::of(&ViewportGL::update));
                 mFrameTick.start();
+
+                TODO("Make grid rendering more efficient (don't create VBO/VAO every frame)");
+            }
+
+            void setRenderCoordinateSystemEnabled(bool enabled) {
+                mRenderCoords = enabled;
+            }
+
+            bool getRenderCoordinateSystemEnabled() const {
+                return mRenderCoords;
             }
         
         protected:
@@ -40,11 +51,14 @@ namespace SierraEditor::Viewport::GL {
             void paintGL() override;
 
         private:
+            void mRenderCoordinateSystem();
+            
             QOpenGLShaderProgram mShader;
             QMatrix4x4 mProjection;
             GL::Camera mCamera;
             std::unique_ptr<GL::Mesh> mMesh;
             QElapsedTimer mDeltaTimer;
             QTimer mFrameTick;
+            bool mRenderCoords = true;
     };
 }

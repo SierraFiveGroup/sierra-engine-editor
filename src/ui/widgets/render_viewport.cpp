@@ -35,6 +35,13 @@ namespace SierraEditor::UI {
         mTabs->setCurrentIndex(0);
     }
 
+    void RenderViewport::toggleGridView() {
+        auto* viewportGL = dynamic_cast<SierraEditor::Viewport::GL::ViewportGL*>(mSceneView);
+        if (viewportGL) {
+            viewportGL->setRenderCoordinateSystemEnabled(!viewportGL->getRenderCoordinateSystemEnabled());
+        }
+    }
+
     // ---- BlueScreenGL ----
 
     BlueScreenGL::BlueScreenGL(QWidget* parent, std::string* rendermsgPtr)

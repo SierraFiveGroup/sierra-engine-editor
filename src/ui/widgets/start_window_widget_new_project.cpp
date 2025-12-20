@@ -77,6 +77,7 @@ namespace SierraEditor::UI {
                 stream << "    <Directories>\n";
                 stream << "        <Assets>assets/</Assets>\n"; // Might have to be ./assets/ depending on how we handle paths
                 stream << "        <Scripts>scripts/</Scripts>\n";
+                stream << "        <Scenes>scenes/</Scenes>\n";
                 stream << "    </Directories>\n";
                 stream << "    <Metadata>\n";
                 stream << "        <Created>" << QDate::currentDate().toString(Qt::ISODate) << "</Created>\n";
@@ -93,12 +94,13 @@ namespace SierraEditor::UI {
             // ANY assets/scripts outside these folders will be IGNORED and will probably fail the build.
             mkdir((fullPath + "/assets").toStdString().c_str(), 0755);
             mkdir((fullPath + "/scripts").toStdString().c_str(), 0755);
+            mkdir((fullPath + "/scenes").toStdString().c_str(), 0755);
 
             this->close();
             auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "/" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);
             mainWindow->show();
 
-            TODO("Forwarding the user to the main window after project creation should auto-load the corresponding project.");
+            //TODO("Forwarding the user to the main window after project creation should auto-load the corresponding project.");
 
             #else
 
@@ -114,6 +116,7 @@ namespace SierraEditor::UI {
                 stream << "    <Directories>\n";
                 stream << "        <Assets>assets\\</Assets>\n"; /* Or .\\assets\\ */
                 stream << "        <Scripts>scripts\\</Scripts>\n";
+                stream << "        <Scenes>scenes\\</Scenes>\n";
                 stream << "    </Directories>\n";
                 stream << "    <Metadata>\n";
                 stream << "        <Created>" << QDate::currentDate().toString(Qt::ISODate) << "</Created>\n";
@@ -128,6 +131,7 @@ namespace SierraEditor::UI {
 
             _mkdir((fullPath + "\\assets").toStdString().c_str());
             _mkdir((fullPath + "\\scripts").toStdString().c_str());
+            _mkdir((fullPath + "\\scenes").toStdString().c_str());
 
             this->close();
             auto* mainWindow = new MainWindow(std::string(fullPath.toStdString() + "\\" + mNameInput->text().toStdString() + ".sierra").c_str(), nullptr);

@@ -3,6 +3,7 @@
 
 #include <sierra/viewport/gl/viewport_gl.hpp>
 #include <QOpenGLShader>
+#include <sierra/utils.hpp>
 
 namespace SierraEditor::Viewport::GL {
     void ViewportGL::initializeGL() {
@@ -47,6 +48,11 @@ namespace SierraEditor::Viewport::GL {
 
         mShader.release();
 
+        // Render coordinate system grid if enabled
+        if (mRenderCoords) {
+            mRenderCoordinateSystem();
+        }
+
         // Draw debug text overlay
         glDisable(GL_DEPTH_TEST);
         glDisable(GL_CULL_FACE);
@@ -90,6 +96,21 @@ namespace SierraEditor::Viewport::GL {
         int num_quads = stb_easy_font_print(x, y, buffer, NULL, stb_buffer, sizeof(stb_buffer));
 
         if (num_quads > 0) {
+            // stb_easy_font outputs quads with vertices: x, y, u, v (16 bytes per vertex)
+            // We need to convert to our format: x, y, 0, r, g, b
+            std::vector<float> textVertices;
+            textVertices.reserve(num_quads * 4 * 6); // 6 floats per vertex
+            
+            float* stb_data = (float*)stb_buffer;
+            for (int i = 0; i < num_quads * 4; ++i) {
+                textVertices.push_back(stb_data[i * 4 + 0]); // x
+                textVertices.push_back(stb_data[i * 4 + 1]); // y
+                textVertices.push_back(0.0f);                // z
+                textVertices.push_back(1.0f);                // r (white)
+                textVertices.push_back(1.0f);                // g
+                textVertices.push_back(1.0f);                // b
+            }
+            
             // Create VAO and VBO for text
             GLuint textVAO, textVBO;
             glGenVertexArrays(1, &textVAO);
@@ -97,10 +118,15 @@ namespace SierraEditor::Viewport::GL {
             
             glBindVertexArray(textVAO);
             glBindBuffer(GL_ARRAY_BUFFER, textVBO);
-            glBufferData(GL_ARRAY_BUFFER, num_quads * 4 * 16, stb_buffer, GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, textVertices.size() * sizeof(float), textVertices.data(), GL_DYNAMIC_DRAW);
             
+            // Position attribute
             glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 16, (void*)0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+            
+            // Color attribute
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
             
             glDrawArrays(GL_QUADS, 0, num_quads * 4);
             
@@ -113,5 +139,96 @@ namespace SierraEditor::Viewport::GL {
         
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
+    }
+
+    void ViewportGL::mRenderCoordinateSystem() {
+        // Grid parameters - large grid for "infinite" appearance
+        const int gridSize = 1000;  // 1000x1000 grid; TODO: Dynamic and not render too far away (frame drops)
+        const float gridSpacing = 1.0f;
+        const float halfGrid = gridSize * gridSpacing * 0.5f;
+
+        // Prepare grid vertices with colors (position + color)
+        std::vector<float> gridVertices;
+        
+        // Light gray color for grid lines
+        const float grayR = 0.4f, grayG = 0.4f, grayB = 0.4f;
+        
+        // Lines parallel to X-axis (running along X direction)
+        for (int i = 0; i <= gridSize; ++i) {
+            float z = -halfGrid + i * gridSpacing;
+            bool isCenterZ = (i == gridSize / 2);
+            
+            if (!isCenterZ) {
+                // Regular grid line in light gray
+                gridVertices.insert(gridVertices.end(), {
+                    -halfGrid, 0.0f, z, grayR, grayG, grayB,  // Start point + color
+                     halfGrid, 0.0f, z, grayR, grayG, grayB   // End point + color
+                });
+            }
+        }
+        
+        // Lines parallel to Z-axis (running along Z direction)
+        for (int i = 0; i <= gridSize; ++i) {
+            float x = -halfGrid + i * gridSpacing;
+            bool isCenterX = (i == gridSize / 2);
+            
+            if (!isCenterX) {
+                // Regular grid line in light gray
+                gridVertices.insert(gridVertices.end(), {
+                    x, 0.0f, -halfGrid, grayR, grayG, grayB,  // Start point + color
+                    x, 0.0f,  halfGrid, grayR, grayG, grayB   // End point + color
+                });
+            }
+        }
+
+        // Add central X-axis (red)
+        gridVertices.insert(gridVertices.end(), {
+            -halfGrid, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f,  // Start point + red
+             halfGrid, 0.0f, 0.0f, 1.0f, 0.0f, 0.0f   // End point + red
+        });
+        
+        // Add central Z-axis (blue)
+        glm::vec3 blueColor = SierraEditor::rgbtofloats(glm::vec3(37, 150, 190));
+        gridVertices.insert(gridVertices.end(), {
+            0.0f, 0.0f, -halfGrid, blueColor.r, blueColor.g, blueColor.b,  // Start point + blue
+            0.0f, 0.0f,  halfGrid, blueColor.r, blueColor.g, blueColor.b   // End point + blue
+        });
+
+        // Create temporary VAO and VBO for grid
+        GLuint gridVAO, gridVBO;
+        glGenVertexArrays(1, &gridVAO);
+        glGenBuffers(1, &gridVBO);
+        
+        glBindVertexArray(gridVAO);
+        glBindBuffer(GL_ARRAY_BUFFER, gridVBO);
+        glBufferData(GL_ARRAY_BUFFER, 
+                     gridVertices.size() * sizeof(float),
+                     gridVertices.data(),
+                     GL_STATIC_DRAW);
+        
+        // Position attribute
+        glEnableVertexAttribArray(0);
+        glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+        
+        // Color attribute
+        glEnableVertexAttribArray(1);
+        glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+        // Set up shader for grid rendering
+        mShader.bind();
+        mShader.setUniformValue("uProj", mProjection);
+        mShader.setUniformValue("uView", mCamera.view());
+        mShader.setUniformValue("uModel", QMatrix4x4());
+        
+        // Draw grid lines
+        glLineWidth(1.0f);
+        glDrawArrays(GL_LINES, 0, gridVertices.size() / 6);
+        
+        mShader.release();
+        
+        // Cleanup
+        glBindVertexArray(0);
+        glDeleteBuffers(1, &gridVBO);
+        glDeleteVertexArrays(1, &gridVAO);
     }
 }
