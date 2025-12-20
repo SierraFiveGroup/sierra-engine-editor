@@ -130,6 +130,32 @@ namespace SierraEditor::UI {
             mViewport->toggleGridView();
         });
         viewMenu->addAction(toggleGridAction);
+
+        QMenu* gameMenu = menuBar()->addMenu("Game");
+
+        QAction* playGameAction = new QAction("Play", this);
+        playGameAction->setShortcut(QKeySequence(Qt::Key_F5));
+
+        QAction* stopGameAction = new QAction("Stop", this);
+        stopGameAction->setShortcut(QKeySequence(Qt::Key_F6));
+
+        QAction* pauseGameAction = new QAction("Pause", this);
+        pauseGameAction->setShortcut(QKeySequence(Qt::Key_F7));
+
+        // Hook all to an unimplemented popup
+        connect(playGameAction, &QAction::triggered, this, []() {
+            TODO("Play Game - Not yet implemented");
+        });
+        connect(stopGameAction, &QAction::triggered, this, []() {
+            TODO("Stop Game - Not yet implemented");
+        });
+        connect(pauseGameAction, &QAction::triggered, this, []() {
+            TODO("Pause Game - Not yet implemented");
+        });
+
+        gameMenu->addAction(playGameAction);
+        gameMenu->addAction(stopGameAction);
+        gameMenu->addAction(pauseGameAction);
     }
 
     void MainWindow::mSetupDockPanels() {
