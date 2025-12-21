@@ -59,7 +59,7 @@ namespace SierraEditor::UI {
         QAction* inspectorAction = menu.addAction("Inspector Panel");
         QAction* hierarchyAction = menu.addAction("Hierarchy Panel");
         QAction* assetAction     = menu.addAction("Asset Browser");
-        QAction* consoleAction   = menu.addAction("Console Panel");
+        QAction* consoleAction   = menu.addAction("Console Output");
 
         QAction* chosen = menu.exec(QCursor::pos());
         if (!chosen)
