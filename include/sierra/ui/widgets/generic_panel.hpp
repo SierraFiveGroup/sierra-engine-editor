@@ -8,8 +8,6 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QMenu>
-#include <QLabel>
-
 #include <sierra/ui/widgets/always_visible_tabwidget.hpp>
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -21,6 +19,7 @@ namespace SierraEditor::UI {
 
     public:
         explicit GenericPanel(QWidget* parent = nullptr);
+        void setActiveTab(int index) { tabs->setCurrentIndex(index); }
 
     public slots:
         void addNewTab(QWidget* w, const QString& title);

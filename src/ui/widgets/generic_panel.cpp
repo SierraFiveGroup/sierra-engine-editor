@@ -7,6 +7,8 @@
 #include <QAction>
 #include <QCursor>
 
+#include <sierra/ui/widgets/console_output.hpp>
+
 namespace SierraEditor::UI {
 
     GenericPanel::GenericPanel(QWidget* parent)
@@ -81,7 +83,7 @@ namespace SierraEditor::UI {
             title = "Asset Browser";
         }
         else if (chosen == consoleAction) {
-            newWidget = new QLabel("Console Output");
+            newWidget = new ConsoleOutputWidget();
             title = "Console";
         }
 

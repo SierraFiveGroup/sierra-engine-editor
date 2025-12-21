@@ -57,6 +57,8 @@ namespace SierraEditor::UI {
                     // Remove the last part of the file path to get the project directory
                     assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
                     mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
+                    mGenericBottom->addNewTab(new ConsoleOutputWidget(), "Console Output");
+                    mGenericBottom->setActiveTab(0);
 
                     mViewport->switchToSceneView();
                 } else {
@@ -102,6 +104,12 @@ namespace SierraEditor::UI {
             mSpawnGenericPanelWithWidget("Asset Browser", new AssetBrowser());
         });
 
+        QAction* spawnConsoleAction = new QAction("Console Output", this);
+        spawnConsoleAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_C));
+        connect(spawnConsoleAction, &QAction::triggered, this, [this]() {
+            mSpawnGenericPanelWithWidget("Console Output", new ConsoleOutputWidget());
+        });
+
         // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(openProjectAction);
@@ -122,6 +130,7 @@ namespace SierraEditor::UI {
         windowMenu->addAction(spawnHierarchyAction);
         windowMenu->addAction(spawnInspectorAction);
         windowMenu->addAction(spawnAssetBrowserAction);
+        windowMenu->addAction(spawnConsoleAction);
 
         QMenu* viewMenu = menuBar()->addMenu("View");
         QAction* toggleGridAction = new QAction("Toggle Grid", this);
@@ -229,6 +238,8 @@ namespace SierraEditor::UI {
             // Remove the last part of the file path to get the project directory
             assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
             mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
+            mGenericBottom->addNewTab(new ConsoleOutputWidget(), "Console Output");
+            mGenericBottom->setActiveTab(0);
 
             mViewport->switchToSceneView();
         } else {

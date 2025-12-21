@@ -21,6 +21,7 @@
 #include <sierra/ui/widgets/render_viewport.hpp>
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/generic_panel.hpp>
+#include <sierra/ui/widgets/console_output.hpp>
 #include <sierra/project/sproject.hpp>
 #include <sierra/io/keyboard.hpp>
 #include <sierra/io/mouse.hpp>
