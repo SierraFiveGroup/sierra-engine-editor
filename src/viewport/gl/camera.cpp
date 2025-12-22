@@ -46,41 +46,48 @@ namespace SierraEditor::Viewport::GL {
 
             mPrevMouseX = currentMouseX;
             mPrevMouseY = currentMouseY;
+
+            // Recompute orientation from yaw/pitch to keep basis orthonormal
+            const float yawRad = DEG2RAD(mYaw);
+            const float pitchRad = DEG2RAD(mPitch);
+
+            mForward = QVector3D(
+                std::cos(pitchRad) * std::cos(yawRad),
+                std::sin(pitchRad),
+                std::cos(pitchRad) * std::sin(yawRad)
+            ).normalized();
+
+            const QVector3D worldUp(0.0f, 1.0f, 0.0f);
+            QVector3D right = QVector3D::crossProduct(mForward, worldUp);
+            if (right.lengthSquared() > 1e-6f) {
+                mRight = right.normalized();
+            }
+            mUp = QVector3D::crossProduct(mRight, mForward).normalized();
+
+            // Movement using the refreshed basis vectors
+            float velocity = mMoveSpeed * dt;
+
+            if (kb.isKeyPressed(Qt::Key_W))
+                mPosition += mForward * velocity;
+            if (kb.isKeyPressed(Qt::Key_S))
+                mPosition -= mForward * velocity;
+
+            if (kb.isKeyPressed(Qt::Key_A))
+                mPosition -= mRight * velocity;
+            if (kb.isKeyPressed(Qt::Key_D))
+                mPosition += mRight * velocity;
+
+            // Q and E move up and down regardless of camera orientation
+            if (kb.isKeyPressed(Qt::Key_Q))
+                mPosition -= worldUp * velocity;
+            if (kb.isKeyPressed(Qt::Key_E))
+                mPosition += worldUp * velocity;
+
         } else {
             // Reset previous mouse positions when right button is not pressed
             mPrevMouseX = IO::Mouse::getInstance().getMouseX();
             mPrevMouseY = IO::Mouse::getInstance().getMouseY();
         }
-
-        // Recompute orientation from yaw/pitch to keep basis orthonormal
-        const float yawRad = DEG2RAD(mYaw);
-        const float pitchRad = DEG2RAD(mPitch);
-
-        mForward = QVector3D(
-            std::cos(pitchRad) * std::cos(yawRad),
-            std::sin(pitchRad),
-            std::cos(pitchRad) * std::sin(yawRad)
-        ).normalized();
-
-        const QVector3D worldUp(0.0f, 1.0f, 0.0f);
-        QVector3D right = QVector3D::crossProduct(mForward, worldUp);
-        if (right.lengthSquared() > 1e-6f) {
-            mRight = right.normalized();
-        }
-        mUp = QVector3D::crossProduct(mRight, mForward).normalized();
-
-        // Movement using the refreshed basis vectors
-        float velocity = mMoveSpeed * dt;
-
-        if (kb.isKeyPressed(Qt::Key_W))
-            mPosition += mForward * velocity;
-        if (kb.isKeyPressed(Qt::Key_S))
-            mPosition -= mForward * velocity;
-
-        if (kb.isKeyPressed(Qt::Key_A))
-            mPosition -= mRight * velocity;
-        if (kb.isKeyPressed(Qt::Key_D))
-            mPosition += mRight * velocity;
     }
 
     QMatrix4x4 Camera::view() const {

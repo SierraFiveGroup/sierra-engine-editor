@@ -26,7 +26,7 @@ namespace SierraEditor::UI {
 
         // Use system monospace font (Menlo on macOS, Courier New on Windows, etc.)
         QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
-        monoFont.setPointSize(11);
+        monoFont.setPointSize(10);
         mTextEdit->setFont(monoFont);
 
         auto* layout = new QVBoxLayout(this);
