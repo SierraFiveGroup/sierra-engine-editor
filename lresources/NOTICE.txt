@@ -21,6 +21,8 @@ This notice may ONLY be modified with prior written permission from the copyrigh
 You may NOT contribute to the development of these Files unless authorized by the copyright holders of these Files.
 Note that this notice does NOT affect your rights granted under the LGPL v2.1 for any other files located in the broader Sierra Engine Editor repository, outside of this directory.
 
+This notice may be updated at any time, without prior notice, at the sole discretion of the copyright holders.
+
 Copyright SierraFive Group 2025, All Rights Reserved.
 
 For more information, please visit https://sierrafive.net/legal/

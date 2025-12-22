@@ -44,9 +44,9 @@ int main(int argc, char *argv[]) {
         QSurfaceFormat::setDefaultFormat(fmt);
     }
 
-    // Load the theme
+    // Load the theme from Qt resources
     TODO("Make theme load dynamically");
-    QFile file("../styles/dark.qss");
+    QFile file(":/styles/dark.qss");
     if (file.open(QFile::ReadOnly)) {
         QApplication::setStyle("Fusion");
         app.setStyleSheet(file.readAll());

@@ -34,6 +34,11 @@ file(GLOB_RECURSE PROJECT_SOURCES
     "${INC_DIR}/*.hpp"
 )
 
+# Qt resources (styles and shaders)
+set(PROJECT_RESOURCES
+    ${CMAKE_SOURCE_DIR}/resources/resources.qrc
+)
+
 # Get GLM
 find_package(glm REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
@@ -50,6 +55,7 @@ FetchContent_MakeAvailable(cxxopts)
 # ---- Executable ----
 add_executable(${PROJECT_NAME}
     ${PROJECT_SOURCES}
+    ${PROJECT_RESOURCES}
 )
 
 # Add include directory

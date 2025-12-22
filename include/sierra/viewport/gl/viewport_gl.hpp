@@ -6,6 +6,7 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLShaderProgram>
+#include <QSurfaceFormat>
 #include <QMatrix4x4>
 #include <QElapsedTimer>
 #include <QTimer>
@@ -27,6 +28,17 @@ namespace SierraEditor::Viewport::GL {
         Q_OBJECT
         public:
             explicit ViewportGL(QWidget* parent = nullptr) : QOpenGLWidget(parent) {
+                // Ensure per-widget format matches global defaults
+                QSurfaceFormat fmt;
+                fmt.setRenderableType(QSurfaceFormat::OpenGL);
+                fmt.setVersion(4, 1);
+                fmt.setProfile(QSurfaceFormat::CoreProfile);
+                fmt.setDepthBufferSize(24);
+                fmt.setStencilBufferSize(8);
+                fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+                fmt.setSamples(0);
+                setFormat(fmt);
+
                 // Set focus policy to only accept when clicked into viewport
                 setFocusPolicy(Qt::ClickFocus);
 
@@ -54,6 +66,7 @@ namespace SierraEditor::Viewport::GL {
             void mRenderCoordinateSystem();
             
             QOpenGLShaderProgram mShader;
+            bool mShaderReady = false;
             QMatrix4x4 mProjection;
             GL::Camera mCamera;
             std::unique_ptr<GL::Mesh> mMesh;

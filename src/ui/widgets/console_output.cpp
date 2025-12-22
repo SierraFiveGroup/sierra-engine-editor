@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QTimer>
 #include <QFont>
+#include <QFontDatabase>
 #include <QTextCursor>
 #include <QtGlobal>
 #include <QString>
@@ -23,8 +24,9 @@ namespace SierraEditor::UI {
         mTextEdit->setUndoRedoEnabled(false);
         mTextEdit->setAcceptRichText(true);
 
-        QFont monoFont("Monospace");
-        monoFont.setStyleHint(QFont::TypeWriter);
+        // Use system monospace font (Menlo on macOS, Courier New on Windows, etc.)
+        QFont monoFont = QFontDatabase::systemFont(QFontDatabase::FixedFont);
+        monoFont.setPointSize(11);
         mTextEdit->setFont(monoFont);
 
         auto* layout = new QVBoxLayout(this);

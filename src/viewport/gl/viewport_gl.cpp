@@ -3,6 +3,7 @@
 
 #include <sierra/viewport/gl/viewport_gl.hpp>
 #include <QOpenGLShader>
+#include <QOpenGLContext>
 #include <sierra/utils.hpp>
 
 namespace SierraEditor::Viewport::GL {
@@ -14,11 +15,29 @@ namespace SierraEditor::Viewport::GL {
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
 
-        mShader.addShaderFromSourceFile(
-            QOpenGLShader::Vertex, "../shaders/basic.vert");
-        mShader.addShaderFromSourceFile(
-            QOpenGLShader::Fragment, "../shaders/basic.frag");
-        mShader.link();
+        // Log runtime GL info to help diagnose macOS issues
+        if (auto* ctx = QOpenGLContext::currentContext()) {
+            const auto fmt = ctx->format();
+            LOG("OpenGL Context Version: " << fmt.majorVersion() << "." << fmt.minorVersion() <<
+                " Profile: " << (fmt.profile() == QSurfaceFormat::CoreProfile ? "Core" : "Compatibility"));
+        }
+
+        const QString vertPath = ":/shaders/basic.vert";
+        const QString fragPath = ":/shaders/basic.frag";
+
+        bool okV = mShader.addShaderFromSourceFile(QOpenGLShader::Vertex, vertPath);
+        if (!okV) {
+            ERROR("Vertex shader compile failed: " << mShader.log().toStdString());
+        }
+        bool okF = mShader.addShaderFromSourceFile(QOpenGLShader::Fragment, fragPath);
+        if (!okF) {
+            ERROR("Fragment shader compile failed: " << mShader.log().toStdString());
+        }
+        bool okL = mShader.link();
+        if (!okL) {
+            ERROR("Shader link failed: " << mShader.log().toStdString());
+        }
+        mShaderReady = okV && okF && okL;
 
         mMesh = std::make_unique<GL::Mesh>(static_cast<QOpenGLFunctions_4_1_Core*>(this));
         mMesh->create(); // VAO/VBO
@@ -39,14 +58,18 @@ namespace SierraEditor::Viewport::GL {
         glClearColor(0.1f, 0.1f, 0.12f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        mShader.bind();
-        mShader.setUniformValue("uProj", mProjection);
-        mShader.setUniformValue("uView", mCamera.view());
-        mShader.setUniformValue("uModel", QMatrix4x4());
+        if (mShaderReady) {
+            mShader.bind();
+            mShader.setUniformValue("uProj", mProjection);
+            mShader.setUniformValue("uView", mCamera.view());
+            mShader.setUniformValue("uModel", QMatrix4x4());
 
-        mMesh->draw();
+            mMesh->draw();
 
-        mShader.release();
+            mShader.release();
+        } else {
+            WARN("Skipping mesh draw: shader not ready");
+        }
 
         // Render coordinate system grid if enabled
         if (mRenderCoords) {
@@ -61,9 +84,10 @@ namespace SierraEditor::Viewport::GL {
         QMatrix4x4 orthoProj;
         orthoProj.ortho(0, width(), height(), 0, -1, 1);
         
-        mShader.bind();
-        mShader.setUniformValue("uProj", orthoProj);
-        mShader.setUniformValue("uView", QMatrix4x4());
+        if (mShaderReady) {
+            mShader.bind();
+            mShader.setUniformValue("uProj", orthoProj);
+            mShader.setUniformValue("uView", QMatrix4x4());
         
         QMatrix4x4 textModel;
         float scale = 1.5f;
@@ -147,7 +171,10 @@ namespace SierraEditor::Viewport::GL {
             glDeleteVertexArrays(1, &textVAO);
         }
 
-        mShader.release();
+            mShader.release();
+        } else {
+            WARN("Skipping text draw: shader not ready");
+        }
         
         glEnable(GL_DEPTH_TEST);
         glEnable(GL_CULL_FACE);
@@ -227,16 +254,20 @@ namespace SierraEditor::Viewport::GL {
         glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
 
         // Set up shader for grid rendering
-        mShader.bind();
-        mShader.setUniformValue("uProj", mProjection);
-        mShader.setUniformValue("uView", mCamera.view());
-        mShader.setUniformValue("uModel", QMatrix4x4());
+        if (mShaderReady) {
+            mShader.bind();
+            mShader.setUniformValue("uProj", mProjection);
+            mShader.setUniformValue("uView", mCamera.view());
+            mShader.setUniformValue("uModel", QMatrix4x4());
         
         // Draw grid lines
         glLineWidth(1.0f);
         glDrawArrays(GL_LINES, 0, gridVertices.size() / 6);
         
-        mShader.release();
+            mShader.release();
+        } else {
+            WARN("Skipping grid draw: shader not ready");
+        }
         
         // Cleanup
         glBindVertexArray(0);

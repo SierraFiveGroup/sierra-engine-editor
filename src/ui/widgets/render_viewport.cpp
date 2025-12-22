@@ -3,6 +3,7 @@
 
 #include <sierra/ui/widgets/render_viewport.hpp>
 #include <QOpenGLShader>
+#include <QString>
 
 namespace SierraEditor::UI {
     RenderViewport::RenderViewport(QWidget* parent, std::string rendermsg)
@@ -53,9 +54,15 @@ namespace SierraEditor::UI {
         initializeOpenGLFunctions();
         glClearColor(0.1f, 0.3f, 0.8f, 1.0f); // blue background
 
-        mShader.addShaderFromSourceFile(QOpenGLShader::Vertex, "../shaders/basic.vert");
-        mShader.addShaderFromSourceFile(QOpenGLShader::Fragment, "../shaders/basic.frag");
-        mShader.link();
+        const QString vertPath = ":/shaders/basic.vert";
+        const QString fragPath = ":/shaders/basic.frag";
+        bool okV = mShader.addShaderFromSourceFile(QOpenGLShader::Vertex, vertPath);
+        bool okF = mShader.addShaderFromSourceFile(QOpenGLShader::Fragment, fragPath);
+        bool okL = mShader.link();
+        bool ok = okV && okF && okL;
+        if (!ok) {
+            WARN("BlueScreenGL: shader setup failed: " << mShader.log().toStdString());
+        }
     }
 
     void BlueScreenGL::paintGL() {
