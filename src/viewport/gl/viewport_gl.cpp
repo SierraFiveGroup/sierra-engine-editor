@@ -20,7 +20,7 @@ namespace SierraEditor::Viewport::GL {
             QOpenGLShader::Fragment, "../shaders/basic.frag");
         mShader.link();
 
-        mMesh = std::make_unique<GL::Mesh>(static_cast<QOpenGLFunctions_4_5_Core*>(this));
+        mMesh = std::make_unique<GL::Mesh>(static_cast<QOpenGLFunctions_4_1_Core*>(this));
         mMesh->create(); // VAO/VBO
     }
 
@@ -96,40 +96,52 @@ namespace SierraEditor::Viewport::GL {
         int num_quads = stb_easy_font_print(x, y, buffer, NULL, stb_buffer, sizeof(stb_buffer));
 
         if (num_quads > 0) {
-            // stb_easy_font outputs quads with vertices: x, y, u, v (16 bytes per vertex)
-            // We need to convert to our format: x, y, 0, r, g, b
+            // Convert stb_easy_font quads (x, y, u, v per vertex) to triangles (core profile)
             std::vector<float> textVertices;
-            textVertices.reserve(num_quads * 4 * 6); // 6 floats per vertex
-            
+            textVertices.reserve(num_quads * 6 * 6); // 6 vertices per quad, 6 floats per vertex
+
             float* stb_data = (float*)stb_buffer;
-            for (int i = 0; i < num_quads * 4; ++i) {
-                textVertices.push_back(stb_data[i * 4 + 0]); // x
-                textVertices.push_back(stb_data[i * 4 + 1]); // y
-                textVertices.push_back(0.0f);                // z
-                textVertices.push_back(1.0f);                // r (white)
-                textVertices.push_back(1.0f);                // g
-                textVertices.push_back(1.0f);                // b
+            for (int q = 0; q < num_quads; ++q) {
+                float* v0 = &stb_data[(q * 4 + 0) * 4];
+                float* v1 = &stb_data[(q * 4 + 1) * 4];
+                float* v2 = &stb_data[(q * 4 + 2) * 4];
+                float* v3 = &stb_data[(q * 4 + 3) * 4];
+
+                auto pushVertex = [&](float x, float y) {
+                    textVertices.push_back(x);
+                    textVertices.push_back(y);
+                    textVertices.push_back(0.0f);
+                    textVertices.push_back(1.0f);
+                    textVertices.push_back(1.0f);
+                    textVertices.push_back(1.0f);
+                };
+
+                // Triangle 1: v0, v1, v2
+                pushVertex(v0[0], v0[1]);
+                pushVertex(v1[0], v1[1]);
+                pushVertex(v2[0], v2[1]);
+                // Triangle 2: v0, v2, v3
+                pushVertex(v0[0], v0[1]);
+                pushVertex(v2[0], v2[1]);
+                pushVertex(v3[0], v3[1]);
             }
-            
-            // Create VAO and VBO for text
+
             GLuint textVAO, textVBO;
             glGenVertexArrays(1, &textVAO);
             glGenBuffers(1, &textVBO);
-            
+
             glBindVertexArray(textVAO);
             glBindBuffer(GL_ARRAY_BUFFER, textVBO);
             glBufferData(GL_ARRAY_BUFFER, textVertices.size() * sizeof(float), textVertices.data(), GL_DYNAMIC_DRAW);
-            
-            // Position attribute
+
             glEnableVertexAttribArray(0);
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-            
-            // Color attribute
+
             glEnableVertexAttribArray(1);
             glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-            
-            glDrawArrays(GL_QUADS, 0, num_quads * 4);
-            
+
+            glDrawArrays(GL_TRIANGLES, 0, num_quads * 6);
+
             glBindVertexArray(0);
             glDeleteBuffers(1, &textVBO);
             glDeleteVertexArrays(1, &textVAO);

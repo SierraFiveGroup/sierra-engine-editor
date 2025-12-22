@@ -4,7 +4,7 @@
 #pragma once
 
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions_4_5_Core>
+#include <QOpenGLFunctions_4_1_Core>
 #include <QOpenGLShaderProgram>
 #include <QMatrix4x4>
 #include <QElapsedTimer>
@@ -23,7 +23,7 @@
 #include <stb/stb_easy_font.h>
 
 namespace SierraEditor::Viewport::GL {
-    class ViewportGL final : public QOpenGLWidget, protected QOpenGLFunctions_4_5_Core {
+    class ViewportGL final : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core {
         Q_OBJECT
         public:
             explicit ViewportGL(QWidget* parent = nullptr) : QOpenGLWidget(parent) {

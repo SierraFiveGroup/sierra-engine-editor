@@ -7,7 +7,9 @@
 #include <QTabWidget>
 #include <QVBoxLayout>
 #include <QOpenGLWidget>
-#include <QOpenGLFunctions>
+#include <QOpenGLFunctions_4_1_Core>
+#include <QOpenGLShaderProgram>
+#include <QMatrix4x4>
 
 #include <string>
 
@@ -39,7 +41,7 @@ namespace SierraEditor::UI {
             QOpenGLWidget* mSceneView = nullptr;
     };
     
-    class BlueScreenGL : public QOpenGLWidget, protected QOpenGLFunctions {
+    class BlueScreenGL : public QOpenGLWidget, protected QOpenGLFunctions_4_1_Core {
         Q_OBJECT
         public:
             explicit BlueScreenGL(QWidget* parent = nullptr, std::string* rendermsgPtr = nullptr);
@@ -51,5 +53,7 @@ namespace SierraEditor::UI {
 
         private:
             std::string* mRenderMsgPtr = nullptr;
+            QOpenGLShaderProgram mShader;
+            QMatrix4x4 mProjection;
     };
 }

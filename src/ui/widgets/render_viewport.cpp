@@ -2,6 +2,7 @@
 // Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/render_viewport.hpp>
+#include <QOpenGLShader>
 
 namespace SierraEditor::UI {
     RenderViewport::RenderViewport(QWidget* parent, std::string rendermsg)
@@ -51,51 +52,94 @@ namespace SierraEditor::UI {
     void BlueScreenGL::initializeGL() {
         initializeOpenGLFunctions();
         glClearColor(0.1f, 0.3f, 0.8f, 1.0f); // blue background
+
+        mShader.addShaderFromSourceFile(QOpenGLShader::Vertex, "../shaders/basic.vert");
+        mShader.addShaderFromSourceFile(QOpenGLShader::Fragment, "../shaders/basic.frag");
+        mShader.link();
     }
 
     void BlueScreenGL::paintGL() {
-        // Orthographic projection
-        glMatrixMode(GL_PROJECTION);
-        glPushMatrix();
-        glLoadIdentity();
-        glOrtho(0, width(), height(), 0, -1, 1);
-
-        glMatrixMode(GL_MODELVIEW);
-        glPushMatrix();
-        glLoadIdentity();
-
-        float scale = 2.0f; // x2 size
-        glScalef(scale, scale, 1.0f);
-
-        // Text stays at (x, y) visually
-        float x = 20.0f / scale;
-        float y = 20.0f / scale;
-
-        // Text and color
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        char* text = "Undefined Message"; // This goes against C++ ISO. Whoops.
+        // Orthographic projection using shader
+        mProjection.setToIdentity();
+        mProjection.ortho(0, width(), height(), 0, -1, 1);
+
+        float scale = 2.0f; // x2 size
+        float x = 20.0f / scale;
+        float y = 20.0f / scale;
+
+        char* text = (char*)"Undefined Message";
         if (mRenderMsgPtr) {
             text = const_cast<char*>((*mRenderMsgPtr).c_str());
         }
         static char buffer[99999];
-        int num_quads = stb_easy_font_print(x, y, const_cast<char*>(text), NULL, buffer, sizeof(buffer));
+        int num_quads = stb_easy_font_print(x, y, text, NULL, buffer, sizeof(buffer));
 
-        glColor3f(1.f, 0.f, 0.f); // Red
-        glEnableClientState(GL_VERTEX_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 16, buffer);
-        glDrawArrays(GL_QUADS, 0, num_quads * 4);
-        glDisableClientState(GL_VERTEX_ARRAY);
+        if (num_quads > 0) {
+            // Prepare vertices as triangles
+            std::vector<float> textVertices;
+            textVertices.reserve(num_quads * 6 * 6);
+
+            float* stb_data = (float*)buffer;
+            for (int q = 0; q < num_quads; ++q) {
+                float* v0 = &stb_data[(q * 4 + 0) * 4];
+                float* v1 = &stb_data[(q * 4 + 1) * 4];
+                float* v2 = &stb_data[(q * 4 + 2) * 4];
+                float* v3 = &stb_data[(q * 4 + 3) * 4];
+
+                auto pushVertex = [&](float vx, float vy) {
+                    textVertices.push_back(vx);
+                    textVertices.push_back(vy);
+                    textVertices.push_back(0.0f);
+                    textVertices.push_back(1.0f);
+                    textVertices.push_back(0.0f);
+                    textVertices.push_back(0.0f); // red text
+                };
+
+                // Tri 1
+                pushVertex(v0[0], v0[1]);
+                pushVertex(v1[0], v1[1]);
+                pushVertex(v2[0], v2[1]);
+                // Tri 2
+                pushVertex(v0[0], v0[1]);
+                pushVertex(v2[0], v2[1]);
+                pushVertex(v3[0], v3[1]);
+            }
+
+            // Model scale for text
+            QMatrix4x4 model;
+            model.scale(scale, scale, 1.0f);
+
+            mShader.bind();
+            mShader.setUniformValue("uProj", mProjection);
+            mShader.setUniformValue("uView", QMatrix4x4());
+            mShader.setUniformValue("uModel", model);
+
+            GLuint vao, vbo;
+            glGenVertexArrays(1, &vao);
+            glGenBuffers(1, &vbo);
+
+            glBindVertexArray(vao);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, textVertices.size() * sizeof(float), textVertices.data(), GL_DYNAMIC_DRAW);
+
+            glEnableVertexAttribArray(0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+            glEnableVertexAttribArray(1);
+            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+            glDrawArrays(GL_TRIANGLES, 0, num_quads * 6);
+
+            glBindVertexArray(0);
+            glDeleteBuffers(1, &vbo);
+            glDeleteVertexArrays(1, &vao);
+
+            mShader.release();
+        }
 
         glEnable(GL_DEPTH_TEST);
-
-        // Restore matrices
-        glMatrixMode(GL_MODELVIEW);
-        glPopMatrix();
-
-        glMatrixMode(GL_PROJECTION);
-        glPopMatrix();
     }
 
     void BlueScreenGL::resizeGL(int w, int h) {

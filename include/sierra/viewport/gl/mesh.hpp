@@ -3,12 +3,12 @@
 
 #pragma once
 
-#include <QOpenGLFunctions_4_5_Core>
+#include <QOpenGLFunctions_4_1_Core>
 
 namespace SierraEditor::Viewport::GL {
     class Mesh {
         public:
-            explicit Mesh(QOpenGLFunctions_4_5_Core* gl);
+            explicit Mesh(QOpenGLFunctions_4_1_Core* gl);
             ~Mesh();
 
             void create();
@@ -16,7 +16,7 @@ namespace SierraEditor::Viewport::GL {
             void draw() const;
 
         private:
-            QOpenGLFunctions_4_5_Core* mGL = nullptr;
+            QOpenGLFunctions_4_1_Core* mGL = nullptr;
 
             GLuint mVAO = 0;
             GLuint mVBO = 0;

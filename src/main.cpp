@@ -26,6 +26,24 @@ int main(int argc, char *argv[]) {
 
     QApplication app(argc, argv);
 
+    // Set a safe global OpenGL surface format for macOS
+    {
+        QSurfaceFormat fmt;
+        fmt.setRenderableType(QSurfaceFormat::OpenGL);
+        fmt.setVersion(4, 1);
+        fmt.setProfile(QSurfaceFormat::CoreProfile);
+        fmt.setDepthBufferSize(24);
+        fmt.setStencilBufferSize(8);
+        fmt.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
+        fmt.setRedBufferSize(8);
+        fmt.setGreenBufferSize(8);
+        fmt.setBlueBufferSize(8);
+        fmt.setAlphaBufferSize(8);
+        // Avoid requesting MSAA until confirmed supported
+        fmt.setSamples(0);
+        QSurfaceFormat::setDefaultFormat(fmt);
+    }
+
     // Load the theme
     TODO("Make theme load dynamically");
     QFile file("../styles/dark.qss");

@@ -26,7 +26,7 @@ namespace SierraEditor::Viewport::GL {
         -1,-1,-1,  0.8f, 0.8f, 0.8f,    1,-1, 1,  0.8f, 0.8f, 0.8f,   -1,-1, 1,  0.8f, 0.8f, 0.8f
     };
 
-    Mesh::Mesh(QOpenGLFunctions_4_5_Core* gl)
+    Mesh::Mesh(QOpenGLFunctions_4_1_Core* gl)
         :
         mGL(gl)
     {}
