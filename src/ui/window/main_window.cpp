@@ -110,6 +110,12 @@ namespace SierraEditor::UI {
             mSpawnGenericPanelWithWidget("Console Output", new ConsoleOutputWidget());
         });
 
+        QAction* spawnProfilerAction = new QAction("Profiler Panel", this);
+        spawnProfilerAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_P));
+        connect(spawnProfilerAction, &QAction::triggered, this, [this]() {
+            mSpawnGenericPanelWithWidget("Profiler", new ProfilerPanel());
+        });
+
         // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(openProjectAction);
@@ -131,6 +137,7 @@ namespace SierraEditor::UI {
         windowMenu->addAction(spawnInspectorAction);
         windowMenu->addAction(spawnAssetBrowserAction);
         windowMenu->addAction(spawnConsoleAction);
+        windowMenu->addAction(spawnProfilerAction);
 
         QMenu* viewMenu = menuBar()->addMenu("View");
         QAction* toggleGridAction = new QAction("Toggle Grid", this);

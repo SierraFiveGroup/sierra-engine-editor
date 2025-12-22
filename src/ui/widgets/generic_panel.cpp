@@ -7,8 +7,6 @@
 #include <QAction>
 #include <QCursor>
 
-#include <sierra/ui/widgets/console_output.hpp>
-
 namespace SierraEditor::UI {
 
     GenericPanel::GenericPanel(QWidget* parent)
@@ -62,6 +60,7 @@ namespace SierraEditor::UI {
         QAction* hierarchyAction = menu.addAction("Hierarchy Panel");
         QAction* assetAction     = menu.addAction("Asset Browser");
         QAction* consoleAction   = menu.addAction("Console Output");
+        QAction* profilerAction  = menu.addAction("Profiler Panel");
 
         QAction* chosen = menu.exec(QCursor::pos());
         if (!chosen)
@@ -85,6 +84,10 @@ namespace SierraEditor::UI {
         else if (chosen == consoleAction) {
             newWidget = new ConsoleOutputWidget();
             title = "Console";
+        }
+        else if (chosen == profilerAction) {
+            newWidget = new ProfilerPanel();
+            title = "Profiler";
         }
 
         addNewTab(newWidget, title);

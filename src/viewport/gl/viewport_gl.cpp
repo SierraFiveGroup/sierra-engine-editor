@@ -39,8 +39,8 @@ namespace SierraEditor::Viewport::GL {
         }
         mShaderReady = okV && okF && okL;
 
-        mMesh = std::make_unique<GL::Mesh>(static_cast<QOpenGLFunctions_4_1_Core*>(this));
-        mMesh->create(); // VAO/VBO
+        //mMesh = std::make_unique<GL::Mesh>(static_cast<QOpenGLFunctions_4_1_Core*>(this));
+        //mMesh->create(); // VAO/VBO
     }
 
     void ViewportGL::resizeGL(int w, int h) {
@@ -64,7 +64,7 @@ namespace SierraEditor::Viewport::GL {
             mShader.setUniformValue("uView", mCamera.view());
             mShader.setUniformValue("uModel", QMatrix4x4());
 
-            mMesh->draw();
+            //mMesh->draw();
 
             mShader.release();
         } else {

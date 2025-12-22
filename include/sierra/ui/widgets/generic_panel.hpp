@@ -12,6 +12,8 @@
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
+#include <sierra/ui/widgets/console_output.hpp>
+#include <sierra/ui/widgets/profiler_panel.hpp>
 
 namespace SierraEditor::UI {
     class GenericPanel : public QWidget {

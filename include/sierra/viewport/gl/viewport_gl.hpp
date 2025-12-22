@@ -69,7 +69,7 @@ namespace SierraEditor::Viewport::GL {
             bool mShaderReady = false;
             QMatrix4x4 mProjection;
             GL::Camera mCamera;
-            std::unique_ptr<GL::Mesh> mMesh;
+            //std::unique_ptr<GL::Mesh> mMesh;
             QElapsedTimer mDeltaTimer;
             QTimer mFrameTick;
             bool mRenderCoords = true;
