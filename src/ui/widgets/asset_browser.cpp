@@ -37,4 +37,8 @@ namespace SierraEditor::UI {
             mTree->setRootIndex(index);
         }
     }
+
+    void AssetBrowser::refresh() {
+        mFileSystemModel->setRootPath(mFileSystemModel->rootPath()); // Refresh by resetting the root path; TODO: Better way?
+    }
 }

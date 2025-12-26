@@ -4,6 +4,7 @@
 #include <sierra/ui/window/main_window.hpp>
 #include <sierra/logger.hpp>
 #include <sierra/io/io_utils.hpp>
+#include <QApplication>
 
 namespace SierraEditor::UI {
     MainWindow::MainWindow(const char* projectPath, QWidget* parent)
@@ -251,6 +252,129 @@ namespace SierraEditor::UI {
             mViewport->switchToSceneView();
         } else {
             ERROR("Failed to load project at: " << projectPath.toStdString());
+        }
+    }
+
+    void MainWindow::contextMenuEvent(QContextMenuEvent* event) {
+        // Get widget under cursor
+        QWidget* widgetUnderCursor = mGetWidgetUnderCursor(event->globalPos());
+
+        // Don't show context menu if clicking on the viewport (central widget)
+        if (widgetUnderCursor && widgetUnderCursor != mViewport && 
+            !mViewport->isAncestorOf(widgetUnderCursor)) {
+            
+            QMenu contextMenu(this);
+            mCreateContextMenuForWidget(&contextMenu, widgetUnderCursor);
+
+            // Only show menu if it has actions
+            if (!contextMenu.isEmpty()) {
+                contextMenu.exec(event->globalPos());
+            }
+        }
+
+        QMainWindow::contextMenuEvent(event);
+    }
+
+    QWidget* MainWindow::mGetWidgetUnderCursor(const QPoint& globalPos) {
+        return QApplication::widgetAt(globalPos);
+    }
+
+    void MainWindow::mCreateContextMenuForWidget(QMenu* menu, QWidget* widget) {
+        if (!widget || !menu) {
+            return;
+        }
+
+        // Check if widget is part of a dock widget (panel area)
+        QDockWidget* dockWidget = nullptr;
+        QWidget* current = widget;
+        while (current) {
+            dockWidget = qobject_cast<QDockWidget*>(current);
+            if (dockWidget) break;
+            current = current->parentWidget();
+        }
+
+        if (dockWidget) {
+            // Context menu for dock widgets
+            QAction* closeAction = menu->addAction("Close Panel");
+            connect(closeAction, &QAction::triggered, this, [dockWidget]() {
+                dockWidget->close();
+            });
+
+            QAction* floatAction = menu->addAction(dockWidget->isFloating() ? "Dock Panel" : "Float Panel");
+            connect(floatAction, &QAction::triggered, this, [dockWidget]() {
+                dockWidget->setFloating(!dockWidget->isFloating());
+            });
+
+            menu->addSeparator();
+        }
+
+        // Check if it's a GenericPanel and provide panel-specific actions
+        GenericPanel* genericPanel = nullptr;
+        current = widget;
+        while (current) {
+            genericPanel = qobject_cast<GenericPanel*>(current);
+            if (genericPanel) break;
+            current = current->parentWidget();
+        }
+
+        if (genericPanel) {
+            // Context menu for GenericPanel (tabbed panels)
+            QMenu* newTabSubMenu = new QMenu("Add Panel", menu);
+            
+            QAction* addHierarchy = newTabSubMenu->addAction("Hierarchy");
+            connect(addHierarchy, &QAction::triggered, this, [this, genericPanel]() {
+                genericPanel->addNewTab(new HierarchyPanel(), "Hierarchy");
+            });
+
+            QAction* addInspector = newTabSubMenu->addAction("Inspector");
+            connect(addInspector, &QAction::triggered, this, [this, genericPanel]() {
+                genericPanel->addNewTab(new InspectorPanel(), "Inspector");
+            });
+
+            QAction* addAssetBrowser = newTabSubMenu->addAction("Asset Browser");
+            connect(addAssetBrowser, &QAction::triggered, this, [this, genericPanel]() {
+                genericPanel->addNewTab(new AssetBrowser(), "Asset Browser");
+            });
+
+            QAction* addConsole = newTabSubMenu->addAction("Console Output");
+            connect(addConsole, &QAction::triggered, this, [this, genericPanel]() {
+                genericPanel->addNewTab(new ConsoleOutputWidget(), "Console Output");
+            });
+
+            menu->addMenu(newTabSubMenu);
+            menu->addSeparator();
+        }
+
+        // Check if the tab is an AssetBrowser to provide specific actions
+        AssetBrowser* assetBrowser = nullptr;
+        current = widget;
+        while (current) {
+            assetBrowser = qobject_cast<AssetBrowser*>(current);
+            if (assetBrowser) break;
+            current = current->parentWidget();
+        }
+        
+        if (assetBrowser) {
+            QAction* refreshAction = menu->addAction("Refresh");
+            connect(refreshAction, &QAction::triggered, this, [assetBrowser]() {
+                assetBrowser->refresh();
+            });
+
+            // "New" Menu for creating new assets, direftories, etc.
+            QMenu* newSubMenu = new QMenu("New", menu);
+            QAction* newDirectoryAction = newSubMenu->addAction("Directory");
+            connect(newDirectoryAction, &QAction::triggered, this, [assetBrowser]() {
+                TODO("Create New Directory in Asset Browser - Not yet implemented");
+            });
+
+            newSubMenu->addSeparator();
+
+            QAction* newSceneAction = newSubMenu->addAction("Scene");
+            connect(newSceneAction, &QAction::triggered, this, [assetBrowser]() {
+                TODO("Create New Scene in Asset Browser - Not yet implemented");
+            });
+
+            menu->addMenu(newSubMenu);
         }
     }
 }

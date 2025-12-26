@@ -15,6 +15,8 @@
 #include <QDir>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QMenu>
+#include <QContextMenuEvent>
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -22,6 +24,7 @@
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/generic_panel.hpp>
 #include <sierra/ui/widgets/console_output.hpp>
+#include <sierra/ui/widgets/profiler_panel.hpp>
 #include <sierra/project/sproject.hpp>
 #include <sierra/io/keyboard.hpp>
 #include <sierra/io/mouse.hpp>
@@ -42,6 +45,8 @@ namespace SierraEditor::UI {
             void mSetupMenus();
             void mSpawnGenericPanelWithWidget(const std::string& panelName, QWidget* widgetToAdd);
             void mRemoveFromActiveGenerics(const std::string& panelName);
+            void mCreateContextMenuForWidget(QMenu* menu, QWidget* widget);
+            QWidget* mGetWidgetUnderCursor(const QPoint& globalPos);
 
             std::unordered_map<std::string, GenericPanel*> mActiveGenerics;
             std::shared_ptr<Project::SProject> mCurrentProject;
@@ -76,5 +81,7 @@ namespace SierraEditor::UI {
                 IO::Mouse::handleMouseMove(event);
                 QMainWindow::mouseMoveEvent(event);
             }
+
+            void contextMenuEvent(QContextMenuEvent* event) override;
     };
 }

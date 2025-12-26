@@ -17,6 +17,7 @@ namespace SierraEditor::UI {
             explicit AssetBrowser(QWidget* parent = nullptr);
 
             void setDirectory(const QString& path);
+            void refresh();
 
         private:
             QTreeView* mTree;
