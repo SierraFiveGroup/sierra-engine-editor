@@ -52,7 +52,7 @@ namespace SierraEditor::UI {
                     this->setWindowTitle(QString::fromStdString("Sierra Engine Editor - " + mCurrentProject->getName()));
                     mViewport->setRenderMessage("No Scene Loaded!");
 
-                    mGenericLeft->addNewTab(new HierarchyPanel(), "Hierarchy");
+                    mGenericLeft->addNewTab(new HierarchyPanel(&mCurrentScene, nullptr), "Hierarchy");
                     mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
                     auto* assetBrowser = new AssetBrowser();
                     // Remove the last part of the file path to get the project directory
@@ -68,6 +68,16 @@ namespace SierraEditor::UI {
             }
         });
 
+        QAction* openSceneAction = new QAction("Open Scene", this);
+        openSceneAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
+        connect(openSceneAction, &QAction::triggered, this, [this]() {
+            // Popup file dialog to open scene
+            QString dir = QFileDialog::getOpenFileName(this, tr("Select Scene File"), QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())), "All Files (*);;Sierra Scene Files (*.scene)", nullptr, QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
+            if (!dir.isEmpty()) {
+                openScene(dir);
+            }
+        });
+
         QAction* saveAllAction = new QAction("Save All", this);
         saveAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
         connect(saveAllAction, &QAction::triggered, this, [this]() {
@@ -80,6 +90,16 @@ namespace SierraEditor::UI {
             } else {
                 WARN("No project loaded; cannot save.");
             }
+
+            if (mCurrentScene && mCurrentScene->getVersion() != 0) {
+                if (mCurrentScene->save()) {
+                    LOG("Scene saved: " << mCurrentScene->getName());
+                } else {
+                    ERROR("Failed to save scene: " << mCurrentScene->getName());
+                }
+            } else {
+                WARN("No scene loaded; cannot save.");
+            }
         });
 
         QAction* exitAction = new QAction("Exit", this);
@@ -90,7 +110,7 @@ namespace SierraEditor::UI {
         spawnHierarchyAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_H));
         // Connect to spawn new Hierarchy panel
         connect(spawnHierarchyAction, &QAction::triggered, this, [this]() {
-            mSpawnGenericPanelWithWidget("Hierarchy", new HierarchyPanel());
+            mSpawnGenericPanelWithWidget("Hierarchy", new HierarchyPanel(&mCurrentScene, nullptr));
         });
 
         QAction* spawnInspectorAction = new QAction("Inspector", this);
@@ -120,6 +140,7 @@ namespace SierraEditor::UI {
         // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(openProjectAction);
+        fileMenu->addAction(openSceneAction);
         fileMenu->addSeparator();
         fileMenu->addAction(saveAllAction);
         fileMenu->addSeparator();
@@ -178,21 +199,21 @@ namespace SierraEditor::UI {
     void MainWindow::mSetupDockPanels() {
         // Hierarchy
         auto* left = new QDockWidget(nullptr, this);
-        mGenericLeft = new GenericPanel();
+        mGenericLeft = new GenericPanel(this);
         left->setWidget(mGenericLeft);
         mActiveGenerics["Hierarchy"] = mGenericLeft;
         addDockWidget(Qt::LeftDockWidgetArea, left);
 
         // Inspector
         auto* right = new QDockWidget(nullptr, this);
-        mGenericRight = new GenericPanel();
+        mGenericRight = new GenericPanel(this);
         right->setWidget(mGenericRight);
         mActiveGenerics["Inspector"] = mGenericRight;
         addDockWidget(Qt::RightDockWidgetArea, right);
 
         // Asset Browser
         auto* bottom = new QDockWidget(nullptr, this);
-        mGenericBottom = new GenericPanel();
+        mGenericBottom = new GenericPanel(this);
         bottom->setWidget(mGenericBottom);
         mActiveGenerics["Asset Browser"] = mGenericBottom;
         addDockWidget(Qt::BottomDockWidgetArea, bottom);
@@ -207,7 +228,7 @@ namespace SierraEditor::UI {
             }
         }
 
-        auto* newPanel = new GenericPanel();
+        auto* newPanel = new GenericPanel(this);
         newPanel->addNewTab(widgetToAdd, QString::fromStdString(panelName + (count > 0 ? " (" + std::to_string(count) + ")" : "")));
         mActiveGenerics[panelName] = newPanel;
 
@@ -240,7 +261,7 @@ namespace SierraEditor::UI {
             this->setWindowTitle(QString::fromStdString("Sierra Engine Editor - " + mCurrentProject->getName()));
             mViewport->setRenderMessage("No Scene Loaded!");
 
-            mGenericLeft->addNewTab(new HierarchyPanel(), "Hierarchy");
+            mGenericLeft->addNewTab(new HierarchyPanel(&mCurrentScene, nullptr), "Hierarchy");
             mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
             auto* assetBrowser = new AssetBrowser();
             // Remove the last part of the file path to get the project directory
@@ -323,7 +344,7 @@ namespace SierraEditor::UI {
             
             QAction* addHierarchy = newTabSubMenu->addAction("Hierarchy");
             connect(addHierarchy, &QAction::triggered, this, [this, genericPanel]() {
-                genericPanel->addNewTab(new HierarchyPanel(), "Hierarchy");
+                genericPanel->addNewTab(new HierarchyPanel(&mCurrentScene, nullptr), "Hierarchy");
             });
 
             QAction* addInspector = newTabSubMenu->addAction("Inspector");
@@ -364,17 +385,47 @@ namespace SierraEditor::UI {
             QMenu* newSubMenu = new QMenu("New", menu);
             QAction* newDirectoryAction = newSubMenu->addAction("Directory");
             connect(newDirectoryAction, &QAction::triggered, this, [assetBrowser]() {
-                TODO("Create New Directory in Asset Browser - Not yet implemented");
+                // Popup for directory name
+                bool ok;
+                QString dirName = QInputDialog::getText(nullptr, "New Directory", "Enter directory name:", QLineEdit::Normal, "NewFolder", &ok);
+                if (ok && !dirName.isEmpty()) {
+                    QString currentPath = QString::fromStdString(assetBrowser->getRootPath());
+                    assetBrowser->createDirectory(dirName.toStdString(), currentPath.toStdString());
+                }
             });
 
             newSubMenu->addSeparator();
 
             QAction* newSceneAction = newSubMenu->addAction("Scene");
             connect(newSceneAction, &QAction::triggered, this, [assetBrowser]() {
-                TODO("Create New Scene in Asset Browser - Not yet implemented");
+                // Popup for scene name
+                bool ok;
+                QString sceneName = QInputDialog::getText(nullptr, "New Scene", "Enter scene name:", QLineEdit::Normal, "NewScene", &ok);
+                if (ok && !sceneName.isEmpty()) {
+                    assetBrowser->createScene(sceneName.toStdString());
+                }
             });
 
             menu->addMenu(newSubMenu);
+        }
+    }
+
+    void MainWindow::openScene(const QString& scenePath) {
+        if (!mCurrentProject || mCurrentProject->getVersion() == 0) {
+            WARN("No project loaded; cannot open scene.");
+            return;
+        }
+
+        mCurrentScene = std::make_shared<Project::SScene>(scenePath.toStdString()); // Update global reference
+        if (mCurrentScene->load()) {
+            LOG("Loaded scene: " << mCurrentScene->getName() << " (Version " << mCurrentScene->getVersion() << ")");
+            LOG("Scene path: " << mCurrentScene->getFilePath());
+
+            //mViewport->setCurrentScene(mCurrentScene);
+            mViewport->switchToSceneView();
+        } else {
+            mCurrentScene = nullptr; // Reset on failure
+            ERROR("Failed to load scene at: " << scenePath.toStdString());
         }
     }
 }

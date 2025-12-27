@@ -17,6 +17,8 @@
 #include <QMouseEvent>
 #include <QMenu>
 #include <QContextMenuEvent>
+#include <QInputDialog>
+#include <QLineEdit>
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -26,6 +28,8 @@
 #include <sierra/ui/widgets/console_output.hpp>
 #include <sierra/ui/widgets/profiler_panel.hpp>
 #include <sierra/project/sproject.hpp>
+#include <sierra/project/sscene.hpp>
+#include <sierra/logger.hpp>
 #include <sierra/io/keyboard.hpp>
 #include <sierra/io/mouse.hpp>
 #include <unordered_map>
@@ -39,6 +43,11 @@ namespace SierraEditor::UI {
         public:
             explicit MainWindow(const char* projectPath, QWidget* parent = nullptr);
             void openProject(const QString& projectPath);
+            void openScene(const QString& scenePath);
+
+            std::shared_ptr<Project::SScene>* getCurrentSceneRef() {
+                return &mCurrentScene;
+            }
 
         private:
             void mSetupDockPanels();
@@ -49,7 +58,8 @@ namespace SierraEditor::UI {
             QWidget* mGetWidgetUnderCursor(const QPoint& globalPos);
 
             std::unordered_map<std::string, GenericPanel*> mActiveGenerics;
-            std::shared_ptr<Project::SProject> mCurrentProject;
+            std::shared_ptr<Project::SProject> mCurrentProject = nullptr;
+            std::shared_ptr<Project::SScene> mCurrentScene = nullptr;
     
             RenderViewport* mViewport;
             GenericPanel* mGenericLeft;

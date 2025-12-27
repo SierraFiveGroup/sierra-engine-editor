@@ -2,10 +2,12 @@
 // Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/generic_panel.hpp>
+#include <sierra/ui/window/main_window.hpp>
 
 #include <QTabBar>
 #include <QAction>
 #include <QCursor>
+#include <QDockWidget>
 
 namespace SierraEditor::UI {
 
@@ -69,12 +71,24 @@ namespace SierraEditor::UI {
         QWidget* newWidget = nullptr;
         QString title;
 
+        // Get parent as MainWindow to pass current scene reference if needed
+        QWidget* parentWidget = this->parentWidget();
+        while (parentWidget) {
+            if (auto* dock = qobject_cast<QDockWidget*>(parentWidget)) {
+                parentWidget = dock->parentWidget();
+            } else {
+                break;
+            }
+        }
+
         if (chosen == inspectorAction) {
             newWidget = new InspectorPanel();
             title = "Inspector";
         }
         else if (chosen == hierarchyAction) {
-            newWidget = new HierarchyPanel();
+            newWidget = new HierarchyPanel(parentWidget
+                ? static_cast<MainWindow*>(parentWidget)->getCurrentSceneRef()
+                : nullptr, nullptr);
             title = "Hierarchy";
         }
         else if (chosen == assetAction) {

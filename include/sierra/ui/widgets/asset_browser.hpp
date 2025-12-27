@@ -18,6 +18,12 @@ namespace SierraEditor::UI {
 
             void setDirectory(const QString& path);
             void refresh();
+            void createScene(const std::string& name);
+            void createDirectory(const std::string& name, const std::string& parentPath);
+
+            std::string getRootPath() const {
+                return mFileSystemModel->rootPath().toStdString();
+            }
 
         private:
             QTreeView* mTree;

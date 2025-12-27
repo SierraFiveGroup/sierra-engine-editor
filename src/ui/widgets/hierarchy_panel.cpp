@@ -2,16 +2,22 @@
 // Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
+#include <QTimer>
 
 namespace SierraEditor::UI {
-    HierarchyPanel::HierarchyPanel(QWidget* parent)
-        : QWidget(parent)
+    HierarchyPanel::HierarchyPanel(std::shared_ptr<Project::SScene>* currentScene, QWidget* parent)
+        : QWidget(parent), mCurrentSceneRef(currentScene)
     {
         mTree = new QTreeWidget(this);
         mTree->setHeaderLabel("Scene Objects");
 
+        // Initialize last scene for change detection
+        if (mCurrentSceneRef) {
+            mLastScene = *mCurrentSceneRef;
+        }
+
         // Placeholders
-        auto* root = new QTreeWidgetItem(mTree, QStringList() << "<No Scene Loaded>");
+        mPopulateHierarchy();
         //auto* root = new QTreeWidgetItem(mTree, QStringList() << "Root");
         //new QTreeWidgetItem(root, QStringList() << "Camera");
         //new QTreeWidgetItem(root, QStringList() << "GameObject");
@@ -23,5 +29,42 @@ namespace SierraEditor::UI {
         layout->addWidget(mTree);
         layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
+
+        // Set up timer to check for scene updates
+        QTimer* updateTimer = new QTimer(this);
+        connect(updateTimer, &QTimer::timeout, this, &HierarchyPanel::mCheckSceneUpdate);
+        updateTimer->start(100);  // Check every 100ms
+    }
+
+    void HierarchyPanel::mCheckSceneUpdate() {
+        if (!mCurrentSceneRef) {
+            return;
+        }
+
+        // Check if the scene pointer has changed
+        std::shared_ptr<Project::SScene> currentScene = *mCurrentSceneRef;
+        if (currentScene != mLastScene) {
+            mLastScene = currentScene;
+            mPopulateHierarchy();
+        }
+    }
+
+    void HierarchyPanel::mPopulateHierarchy() {
+        mTree->clear();
+
+        if (!mCurrentSceneRef) {
+            ERROR("HierarchyPanel: (You did something very wrong!) CurrentSceneRef is nullptr!");
+        }
+
+        if (!*mCurrentSceneRef) {
+            mRootItem = new QTreeWidgetItem(mTree, QStringList() << "<No Scene Loaded>");
+            return;
+        }
+
+        std::string sceneName = (*mCurrentSceneRef)->getName();
+        mRootItem = new QTreeWidgetItem(mTree, QStringList() << QString::fromStdString(sceneName));
+        // TODO: Populate based on mCurrentScene data
+
+        mTree->expandAll();
     }
 }
