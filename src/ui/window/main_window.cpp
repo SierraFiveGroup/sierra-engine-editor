@@ -40,31 +40,7 @@ namespace SierraEditor::UI {
             // Popup file dialog to open project
             QString dir = QFileDialog::getOpenFileName(this, tr("Select Project File"), QDir::homePath(), "All Files (*);;Sierra Project Files (*.sierra)", nullptr, QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
             if (!dir.isEmpty()) {
-                if (!mCurrentProject->overrideFilePath(dir.toStdString())) {
-                    TODO("Project is already loaded; cannot override file path; ADD SUPPORT FOR SWITCHING PROJECTS");
-                    return; // TODO: Save current project and load new one
-                }
-
-                if (mCurrentProject->load()) {
-                    LOG("Loaded project: " << mCurrentProject->getName() << " (Version " << mCurrentProject->getVersion() << ")");
-                    LOG("Project path: " << mCurrentProject->getFilePath());
-
-                    this->setWindowTitle(QString::fromStdString("Sierra Engine Editor - " + mCurrentProject->getName()));
-                    mViewport->setRenderMessage("No Scene Loaded!");
-
-                    mGenericLeft->addNewTab(new HierarchyPanel(&mCurrentScene, nullptr), "Hierarchy");
-                    mGenericRight->addNewTab(new InspectorPanel(), "Inspector");
-                    auto* assetBrowser = new AssetBrowser();
-                    // Remove the last part of the file path to get the project directory
-                    assetBrowser->setDirectory(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())));
-                    mGenericBottom->addNewTab(assetBrowser, "Asset Browser");
-                    mGenericBottom->addNewTab(new ConsoleOutputWidget(), "Console Output");
-                    mGenericBottom->setActiveTab(0);
-
-                    mViewport->switchToSceneView();
-                } else {
-                    ERROR("Failed to load project at: " << dir.toStdString());
-                }
+                openProject(dir);
             }
         });
 
