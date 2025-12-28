@@ -44,6 +44,13 @@ namespace SierraEditor::UI {
         }
     }
 
+    void RenderViewport::toggleCameraDetailsView() {
+        auto* viewportGL = dynamic_cast<SierraEditor::Viewport::GL::ViewportGL*>(mSceneView);
+        if (viewportGL) {
+            viewportGL->setRenderCameraDetailsEnabled(!viewportGL->getRenderCameraDetailsEnabled());
+        }
+    }
+
     // ---- BlueScreenGL ----
 
     BlueScreenGL::BlueScreenGL(QWidget* parent, std::string* rendermsgPtr)

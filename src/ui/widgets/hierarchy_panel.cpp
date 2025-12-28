@@ -9,7 +9,6 @@ namespace SierraEditor::UI {
         : QWidget(parent), mCurrentSceneRef(currentScene)
     {
         mTree = new QTreeWidget(this);
-        mTree->setHeaderLabel("Scene Objects");
 
         // Initialize last scene for change detection
         if (mCurrentSceneRef) {
@@ -57,12 +56,14 @@ namespace SierraEditor::UI {
         }
 
         if (!*mCurrentSceneRef) {
+            mTree->setHeaderLabel("<No Scene Loaded>");
             mRootItem = new QTreeWidgetItem(mTree, QStringList() << "<No Scene Loaded>");
             return;
         }
 
         std::string sceneName = (*mCurrentSceneRef)->getName();
-        mRootItem = new QTreeWidgetItem(mTree, QStringList() << QString::fromStdString(sceneName));
+        mTree->setHeaderLabel(QString::fromStdString(sceneName));
+        mRootItem = new QTreeWidgetItem(mTree, QStringList() << "Scene Root");
         // TODO: Populate based on mCurrentScene data
 
         mTree->expandAll();

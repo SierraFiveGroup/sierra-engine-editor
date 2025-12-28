@@ -161,6 +161,7 @@ namespace SierraEditor::UI {
         windowMenu->addAction(spawnConsoleAction);
         windowMenu->addAction(spawnProfilerAction);
 
+        // TODO - discuss some keybinds with others since changing keybinds can be controversial
         QMenu* viewMenu = menuBar()->addMenu("View");
         QAction* toggleGridAction = new QAction("Toggle Grid", this);
         toggleGridAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_G));
@@ -168,6 +169,13 @@ namespace SierraEditor::UI {
             mViewport->toggleGridView();
         });
         viewMenu->addAction(toggleGridAction);
+
+        QAction* toggleCameraDetailsAction = new QAction("Toggle Camera Details", this);
+        toggleCameraDetailsAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_D));
+        connect(toggleCameraDetailsAction, &QAction::triggered, this, [this]() {
+            mViewport->toggleCameraDetailsView();
+        });
+        viewMenu->addAction(toggleCameraDetailsAction);
 
         QMenu* gameMenu = menuBar()->addMenu("Game");
 

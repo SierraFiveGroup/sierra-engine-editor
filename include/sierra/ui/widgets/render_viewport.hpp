@@ -34,6 +34,9 @@ namespace SierraEditor::UI {
 
             // Toggle grid view (only in non-blue screen mode)
             void toggleGridView();
+
+            // Toggle camera details view (only in non-blue screen mode)
+            void toggleCameraDetailsView();
         
         private:
             QTabWidget* mTabs;

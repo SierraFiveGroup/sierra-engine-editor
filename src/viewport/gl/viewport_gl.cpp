@@ -94,81 +94,83 @@ namespace SierraEditor::Viewport::GL {
         textModel.scale(scale, scale, 1.0f);
         mShader.setUniformValue("uModel", textModel);
 
-        // Prepare text
-        char buffer[256];
-        float fps = 1.0f / dt;
-        glm::vec3 camPos = mCamera.getGLMPosition();
-        glm::vec2 camOri = mCamera.getGLMYawPitch(); // X=Yaw, Y=Pitch
+        if (mRenderCamDetails) {
+            // Prepare text
+            char buffer[256];
+            float fps = 1.0f / dt;
+            glm::vec3 camPos = mCamera.getGLMPosition();
+            glm::vec2 camOri = mCamera.getGLMYawPitch(); // X=Yaw, Y=Pitch
 
-        snprintf(buffer, sizeof(buffer),
-            "Frame Time: %.2f ms (%.1f FPS)\nPos: (%.2f, %.2f, %.2f)\nYaw: %.2f Pitch: %.2f",
-            dt * 1000.0f, fps,
-            camPos.x, camPos.y, camPos.z, camOri.x, camOri.y);
-        
-        // stb_easy_font characters are ~8px wide, ~9px tall at scale 1.0
-        // Estimate text dimensions (longest line is ~35 chars)
-        float margin = 10.0f / scale; // 10px margin in scaled space
-        float charWidth = 8.0f;
-        float lineHeight = 9.0f;
-        float estimatedWidth = 35.0f * charWidth; // ~280px at scale 1.0
-        float estimatedHeight = 3.0f * lineHeight; // 3 lines
-        
-        float x = (width() / scale) - estimatedWidth - margin;
-        float y = (height() / scale) - estimatedHeight - margin;
-        
-        static char stb_buffer[99999];
-        int num_quads = stb_easy_font_print(x, y, buffer, NULL, stb_buffer, sizeof(stb_buffer));
+            snprintf(buffer, sizeof(buffer),
+                "Frame Time: %.2f ms (%.1f FPS)\nPos: (%.2f, %.2f, %.2f)\nYaw: %.2f Pitch: %.2f",
+                dt * 1000.0f, fps,
+                camPos.x, camPos.y, camPos.z, camOri.x, camOri.y);
+            
+            // stb_easy_font characters are ~8px wide, ~9px tall at scale 1.0
+            // Estimate text dimensions (longest line is ~35 chars)
+            float margin = 10.0f / scale; // 10px margin in scaled space
+            float charWidth = 8.0f;
+            float lineHeight = 9.0f;
+            float estimatedWidth = 35.0f * charWidth; // ~280px at scale 1.0
+            float estimatedHeight = 3.0f * lineHeight; // 3 lines
+            
+            float x = (width() / scale) - estimatedWidth - margin;
+            float y = (height() / scale) - estimatedHeight - margin;
+            
+            static char stb_buffer[99999];
+            int num_quads = stb_easy_font_print(x, y, buffer, NULL, stb_buffer, sizeof(stb_buffer));
 
-        if (num_quads > 0) {
-            // Convert stb_easy_font quads (x, y, u, v per vertex) to triangles (core profile)
-            std::vector<float> textVertices;
-            textVertices.reserve(num_quads * 6 * 6); // 6 vertices per quad, 6 floats per vertex
+            if (num_quads > 0) {
+                // Convert stb_easy_font quads (x, y, u, v per vertex) to triangles (core profile)
+                std::vector<float> textVertices;
+                textVertices.reserve(num_quads * 6 * 6); // 6 vertices per quad, 6 floats per vertex
 
-            float* stb_data = (float*)stb_buffer;
-            for (int q = 0; q < num_quads; ++q) {
-                float* v0 = &stb_data[(q * 4 + 0) * 4];
-                float* v1 = &stb_data[(q * 4 + 1) * 4];
-                float* v2 = &stb_data[(q * 4 + 2) * 4];
-                float* v3 = &stb_data[(q * 4 + 3) * 4];
+                float* stb_data = (float*)stb_buffer;
+                for (int q = 0; q < num_quads; ++q) {
+                    float* v0 = &stb_data[(q * 4 + 0) * 4];
+                    float* v1 = &stb_data[(q * 4 + 1) * 4];
+                    float* v2 = &stb_data[(q * 4 + 2) * 4];
+                    float* v3 = &stb_data[(q * 4 + 3) * 4];
 
-                auto pushVertex = [&](float x, float y) {
-                    textVertices.push_back(x);
-                    textVertices.push_back(y);
-                    textVertices.push_back(0.0f);
-                    textVertices.push_back(1.0f);
-                    textVertices.push_back(1.0f);
-                    textVertices.push_back(1.0f);
-                };
+                    auto pushVertex = [&](float x, float y) {
+                        textVertices.push_back(x);
+                        textVertices.push_back(y);
+                        textVertices.push_back(0.0f);
+                        textVertices.push_back(1.0f);
+                        textVertices.push_back(1.0f);
+                        textVertices.push_back(1.0f);
+                    };
 
-                // Triangle 1: v0, v1, v2
-                pushVertex(v0[0], v0[1]);
-                pushVertex(v1[0], v1[1]);
-                pushVertex(v2[0], v2[1]);
-                // Triangle 2: v0, v2, v3
-                pushVertex(v0[0], v0[1]);
-                pushVertex(v2[0], v2[1]);
-                pushVertex(v3[0], v3[1]);
+                    // Triangle 1: v0, v1, v2
+                    pushVertex(v0[0], v0[1]);
+                    pushVertex(v1[0], v1[1]);
+                    pushVertex(v2[0], v2[1]);
+                    // Triangle 2: v0, v2, v3
+                    pushVertex(v0[0], v0[1]);
+                    pushVertex(v2[0], v2[1]);
+                    pushVertex(v3[0], v3[1]);
+                }
+
+                GLuint textVAO, textVBO;
+                glGenVertexArrays(1, &textVAO);
+                glGenBuffers(1, &textVBO);
+
+                glBindVertexArray(textVAO);
+                glBindBuffer(GL_ARRAY_BUFFER, textVBO);
+                glBufferData(GL_ARRAY_BUFFER, textVertices.size() * sizeof(float), textVertices.data(), GL_DYNAMIC_DRAW);
+
+                glEnableVertexAttribArray(0);
+                glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+
+                glEnableVertexAttribArray(1);
+                glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+
+                glDrawArrays(GL_TRIANGLES, 0, num_quads * 6);
+
+                glBindVertexArray(0);
+                glDeleteBuffers(1, &textVBO);
+                glDeleteVertexArrays(1, &textVAO);
             }
-
-            GLuint textVAO, textVBO;
-            glGenVertexArrays(1, &textVAO);
-            glGenBuffers(1, &textVBO);
-
-            glBindVertexArray(textVAO);
-            glBindBuffer(GL_ARRAY_BUFFER, textVBO);
-            glBufferData(GL_ARRAY_BUFFER, textVertices.size() * sizeof(float), textVertices.data(), GL_DYNAMIC_DRAW);
-
-            glEnableVertexAttribArray(0);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
-
-            glEnableVertexAttribArray(1);
-            glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
-
-            glDrawArrays(GL_TRIANGLES, 0, num_quads * 6);
-
-            glBindVertexArray(0);
-            glDeleteBuffers(1, &textVBO);
-            glDeleteVertexArrays(1, &textVAO);
         }
 
             mShader.release();

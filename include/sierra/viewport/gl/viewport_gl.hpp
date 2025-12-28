@@ -57,6 +57,14 @@ namespace SierraEditor::Viewport::GL {
                 return mRenderCoords;
             }
         
+            void setRenderCameraDetailsEnabled(bool enabled) {
+                mRenderCamDetails = enabled;
+            }
+
+            bool getRenderCameraDetailsEnabled() const {
+                return mRenderCamDetails;
+            }
+
         protected:
             void initializeGL() override;
             void resizeGL(int w, int h) override;
@@ -73,5 +81,6 @@ namespace SierraEditor::Viewport::GL {
             QElapsedTimer mDeltaTimer;
             QTimer mFrameTick;
             bool mRenderCoords = true;
+            bool mRenderCamDetails = true;
     };
 }
