@@ -48,7 +48,23 @@ namespace SierraEditor::Project {
             mData.name = nameNode->value();
         }
 
-        // Find Entities node and parse entities into mData.entities - TODO
+        // Parse entities
+        xml_node<>* entitiesNode = root->first_node("Entities");
+        if (entitiesNode) {
+            for (xml_node<>* entityNode = entitiesNode->first_node("Entity"); entityNode; entityNode = entityNode->next_sibling("Entity")) {
+                // For now just read the entity's name and active status
+                std::shared_ptr<SEntity> entity = std::make_shared<SEntity>();
+                xml_node<>* entityNameNode = entityNode->first_node("Name");
+                if (entityNameNode) {
+                    entity->setName(entityNameNode->value());
+                }
+                xml_node<>* entityActiveNode = entityNode->first_node("Active");
+                if (entityActiveNode) {
+                    entity->setActive(std::string(entityActiveNode->value()) == "true");
+                }
+                mData.entities.insert(entity);
+            }
+        }
 
         return true;
     }
@@ -68,7 +84,17 @@ namespace SierraEditor::Project {
         xml_node<>* nameNode = doc.allocate_node(node_type::node_element, "Name", doc.allocate_string(mData.name.c_str()));
         root->append_node(nameNode);
 
-        // Create Entities node and serialize mData.entities into it - TODO
+        // Parse entities
+        xml_node<>* entitiesNode = doc.allocate_node(node_type::node_element, "Entities");
+        root->append_node(entitiesNode);
+        for (const auto& entity : mData.entities) {
+            xml_node<>* entityNode = doc.allocate_node(node_type::node_element, "Entity");
+            entitiesNode->append_node(entityNode);
+            xml_node<>* entityNameNode = doc.allocate_node(node_type::node_element, "Name", doc.allocate_string(entity->getName().c_str()));
+            entityNode->append_node(entityNameNode);
+            xml_node<>* entityActiveNode = doc.allocate_node(node_type::node_element, "Active", doc.allocate_string(entity->isActive() ? "true" : "false"));
+            entityNode->append_node(entityActiveNode);
+        }
 
         // Convert XML to string
         std::string xmlString;
@@ -79,5 +105,22 @@ namespace SierraEditor::Project {
         bool res = writeFileLines(mData.filePath, lines);
         
         return res;
+    }
+
+    void SScene::addEntity(std::shared_ptr<SEntity> entity) {
+        mData.entities.insert(entity);
+    }
+
+    void SScene::removeEntity(std::shared_ptr<SEntity> entity) {
+        mData.entities.erase(entity);
+    }
+
+    std::shared_ptr<SEntity> SScene::getEntityByName(const std::string& name) const {
+        for (const auto& entity : mData.entities) {
+            if (entity->getName() == name) {
+                return entity;
+            }
+        }
+        return nullptr;
     }
 }

@@ -20,6 +20,19 @@ namespace SierraEditor::UI {
                 mLastScene = mCurrentSceneRef ? *mCurrentSceneRef : nullptr;
                 mPopulateHierarchy();
             }
+
+            void refresh() {
+                mPopulateHierarchy();
+            }
+
+            QTreeWidgetItem* getRootItem() const {
+                return mRootItem;
+            }
+
+            QTreeWidgetItem* getItemAtCursor() const {
+                QPoint cursorPos = mTree->viewport()->mapFromGlobal(QCursor::pos());
+                return mTree->itemAt(cursorPos);
+            }
     
         private slots:
             void mCheckSceneUpdate();

@@ -130,6 +130,22 @@ namespace SierraEditor::UI {
             std::shared_ptr<Project::SScene> scene = Stateful::StatefulManager::getInstance().undo();
             if (scene) {
                 mCurrentScene = scene; // This should automatically update other panels, since they use std::shared_ptr*
+
+                // Refresh Hierarchy Panel if it exists
+                for (const auto& pair : mActiveGenerics) {
+                    // Get tab references
+                    std::unordered_set<AlwaysVisibleTabWidget*> tabs = pair.second->getTabs();
+                    for (AlwaysVisibleTabWidget* tabWidget : tabs) {
+                        for (int i = 0; i < tabWidget->count(); i++) {
+                            QWidget* w = tabWidget->widget(i);
+                            HierarchyPanel* hierarchyPanel = qobject_cast<HierarchyPanel*>(w);
+                            if (hierarchyPanel) {
+                                hierarchyPanel->refresh();
+                            }
+                        }
+                    }
+                }
+
                 LOG("Undid to scene state: " << (mCurrentScene ? mCurrentScene->getName() : "NULL"));
             } else {
                 WARN("No more undo states available.");
@@ -142,6 +158,22 @@ namespace SierraEditor::UI {
             std::shared_ptr<Project::SScene> scene = Stateful::StatefulManager::getInstance().redo();
             if (scene) {
                 mCurrentScene = scene;
+                
+                // Refresh Hierarchy Panel if it exists
+                for (const auto& pair : mActiveGenerics) {
+                    // Get tab references
+                    std::unordered_set<AlwaysVisibleTabWidget*> tabs = pair.second->getTabs();
+                    for (AlwaysVisibleTabWidget* tabWidget : tabs) {
+                        for (int i = 0; i < tabWidget->count(); i++) {
+                            QWidget* w = tabWidget->widget(i);
+                            HierarchyPanel* hierarchyPanel = qobject_cast<HierarchyPanel*>(w);
+                            if (hierarchyPanel) {
+                                hierarchyPanel->refresh();
+                            }
+                        }
+                    }
+                }
+
                 LOG("Redid to scene state: " << (mCurrentScene ? mCurrentScene->getName() : "NULL"));
             } else {
                 WARN("No more redo states available.");
@@ -421,6 +453,59 @@ namespace SierraEditor::UI {
             });
 
             menu->addMenu(newSubMenu);
+
+            return;
+        }
+
+        HierarchyPanel* hierarchyPanel = nullptr;
+        current = widget;
+        while (current) {
+            hierarchyPanel = qobject_cast<HierarchyPanel*>(current);
+            if (hierarchyPanel) break;
+            current = current->parentWidget();
+        }
+
+        if (hierarchyPanel) {
+            QAction* newEntityAction = menu->addAction("New Entity");
+            connect(newEntityAction, &QAction::triggered, this, [this, hierarchyPanel]() {
+                if (mCurrentScene && mCurrentScene->getVersion() != 0) {
+                    // Create a new entity and add it to the scene
+                    std::shared_ptr<Project::SEntity> newEntity = std::make_shared<Project::SEntity>();
+                    newEntity->setName("New Entity");
+                    mCurrentScene->addEntity(newEntity);
+                    hierarchyPanel->refresh(); // Refresh the hierarchy to show the new entity
+
+                    // Save state for undo/redo
+                    Stateful::StatefulManager::getInstance().saveCurrentState(mCurrentScene);
+                } else {
+                    WARN("No scene loaded; cannot create new entity.");
+                }
+            });
+
+            // Check if hovering over an entity item to provide "Delete Entity"
+            QTreeWidgetItem* item = hierarchyPanel->getItemAtCursor();
+            if (item && item != hierarchyPanel->getRootItem()) {
+                QAction* deleteEntityAction = menu->addAction("Delete Entity");
+                connect(deleteEntityAction, &QAction::triggered, this, [this, hierarchyPanel, item]() {
+                    if (mCurrentScene && mCurrentScene->getVersion() != 0) {
+                        std::string entityName = item->text(0).toStdString();
+                        std::shared_ptr<Project::SEntity> entityToRemove = mCurrentScene->getEntityByName(entityName);
+                        if (entityToRemove) {
+                            mCurrentScene->removeEntity(entityToRemove);
+                            hierarchyPanel->refresh();
+
+                            // Save state for undo/redo
+                            Stateful::StatefulManager::getInstance().saveCurrentState(mCurrentScene);
+                        } else {
+                            WARN("Entity not found in scene: " << entityName);
+                        }
+                    } else {
+                        WARN("No scene loaded; cannot delete entity.");
+                    }
+                });
+            }
+
+            return;
         }
     }
 

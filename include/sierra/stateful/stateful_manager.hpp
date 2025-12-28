@@ -45,7 +45,7 @@ namespace SierraEditor::Stateful {
         
         private:
             // Vector of saved scene states (copies)
-            std::vector<std::shared_ptr<Project::SScene>> mSavedStates = {};
+            std::vector<Project::SScene> mSavedStates = {};
 
             size_t mCurrentStateIndex = 0;
             size_t mMaxSavedStates = 50; // Max number of saved states to keep; This may be modifiable in the future

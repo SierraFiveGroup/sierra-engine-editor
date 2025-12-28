@@ -64,7 +64,12 @@ namespace SierraEditor::UI {
         std::string sceneName = (*mCurrentSceneRef)->getName();
         mTree->setHeaderLabel(QString::fromStdString(sceneName));
         mRootItem = new QTreeWidgetItem(mTree, QStringList() << "Scene Root");
-        // TODO: Populate based on mCurrentScene data
+
+        // Populate entities
+        for (const auto& entity : (*mCurrentSceneRef)->getEntities()) {
+            QString entityName = QString::fromStdString(entity->getName());
+            new QTreeWidgetItem(mRootItem, QStringList() << entityName);
+        }
 
         mTree->expandAll();
     }

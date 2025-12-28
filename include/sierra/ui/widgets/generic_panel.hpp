@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <QToolButton>
 #include <QMenu>
+#include <unordered_set>
 #include <sierra/ui/widgets/always_visible_tabwidget.hpp>
 #include <sierra/ui/widgets/asset_browser.hpp>
 #include <sierra/ui/widgets/inspector_panel.hpp>
@@ -22,6 +23,12 @@ namespace SierraEditor::UI {
     public:
         explicit GenericPanel(QWidget* parent = nullptr);
         void setActiveTab(int index) { tabs->setCurrentIndex(index); }
+        QWidget* getCurrentWidget() const { return tabs->currentWidget(); }
+        std::unordered_set<AlwaysVisibleTabWidget*> getTabs() const {
+            std::unordered_set<AlwaysVisibleTabWidget*> tabSet;
+            tabSet.insert(tabs);
+            return tabSet;
+        }
 
     public slots:
         void addNewTab(QWidget* w, const QString& title);

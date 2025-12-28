@@ -6,16 +6,18 @@
 #include <string>
 #include <cstdint>
 #include <vector>
+#include <memory>
 #include <sierra/io/io_utils.hpp>
 #include <sierra/logger.hpp>
 #include <unordered_set>
+#include <sierra/project/sentity.hpp>
 
 namespace SierraEditor::Project {
     struct SSceneData {
         uint16_t version = 0;
         std::string name;
         std::string filePath;
-        //std::unordered_set<FutureEntityObjectOrStructIdk> entities;
+        std::unordered_set<std::shared_ptr<SEntity>> entities;
     };
 
     class SScene {
@@ -40,6 +42,14 @@ namespace SierraEditor::Project {
             uint16_t getVersion() const { return mData.version; }
             std::string getName() const { return mData.name; }
             std::string getFilePath() const { return mData.filePath; }
+            std::unordered_set<std::shared_ptr<SEntity>> getEntities() const { return mData.entities; }
+
+            // Add new entity
+            void addEntity(std::shared_ptr<SEntity> entity);
+            // Remove entity
+            void removeEntity(std::shared_ptr<SEntity> entity);
+            // Get entity by name
+            std::shared_ptr<SEntity> getEntityByName(const std::string& name) const;
 
         private:
             SSceneData mData;
