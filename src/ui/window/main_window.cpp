@@ -48,7 +48,7 @@ namespace SierraEditor::UI {
         openSceneAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_L));
         connect(openSceneAction, &QAction::triggered, this, [this]() {
             // Popup file dialog to open scene
-            QString dir = QFileDialog::getOpenFileName(this, tr("Select Scene File"), QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath())), "All Files (*);;Sierra Scene Files (*.scene)", nullptr, QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
+            QString dir = QFileDialog::getOpenFileName(this, tr("Select Scene File"), QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath()) + "/" + mCurrentProject->getScenesPath()), "All Files (*);;Sierra Scene Files (*.scene)", nullptr, QFileDialog::ReadOnly | QFileDialog::DontResolveSymlinks | QFileDialog::DontUseNativeDialog);
             if (!dir.isEmpty()) {
                 openScene(dir);
             }
@@ -279,7 +279,7 @@ namespace SierraEditor::UI {
             mGenericBottom->addNewTab(new ConsoleOutputWidget(), "Console Output");
             mGenericBottom->setActiveTab(0);
 
-            mViewport->switchToSceneView();
+            //mViewport->switchToSceneView();
 
             if (mCurrentProject->getLastOpenedScene() != "") {
                 LOG("Re-opening last opened scene: " << mCurrentProject->getLastOpenedScene());
