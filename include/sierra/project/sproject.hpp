@@ -20,6 +20,7 @@ namespace SierraEditor::Project {
         std::string filePath;
         std::string assetsPath;
         std::string scriptsPath;
+        std::string scenesPath;
         std::string createdDate;
         std::string modifiedDate;
         std::string lastOpenedScene;
@@ -42,11 +43,16 @@ namespace SierraEditor::Project {
                 return true;
             }
 
+            void setLastScene(const std::string& sceneName) {
+                mData.lastOpenedScene = sceneName;
+            }
+
             uint16_t getVersion() const { return mData.version; }
             std::string getName() const { return mData.name; }
             std::string getFilePath() const { return mData.filePath; }
             std::string getAssetsPath() const { return mData.assetsPath; }
             std::string getScriptsPath() const { return mData.scriptsPath; }
+            std::string getScenesPath() const { return mData.scenesPath; }
             std::string getCreatedDate() const { return mData.createdDate; }
             std::string getModifiedDate() const { return mData.modifiedDate; }
             std::string getLastOpenedScene() const { return mData.lastOpenedScene; }

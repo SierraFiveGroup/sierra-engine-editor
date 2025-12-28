@@ -279,6 +279,11 @@ namespace SierraEditor::UI {
             mGenericBottom->setActiveTab(0);
 
             mViewport->switchToSceneView();
+
+            if (mCurrentProject->getLastOpenedScene() != "") {
+                LOG("Re-opening last opened scene: " << mCurrentProject->getLastOpenedScene());
+                openScene(QString::fromStdString(IO::stripLastPathComponent(mCurrentProject->getFilePath()) + "/" + mCurrentProject->getScenesPath() + mCurrentProject->getLastOpenedScene() + ".scene"));
+            }
         } else {
             ERROR("Failed to load project at: " << projectPath.toStdString());
         }
@@ -429,6 +434,7 @@ namespace SierraEditor::UI {
             LOG("Loaded scene: " << mCurrentScene->getName() << " (Version " << mCurrentScene->getVersion() << ")");
             LOG("Scene path: " << mCurrentScene->getFilePath());
 
+            mCurrentProject->setLastScene(mCurrentScene->getName());
             //mViewport->setCurrentScene(mCurrentScene);
             mViewport->switchToSceneView();
         } else {

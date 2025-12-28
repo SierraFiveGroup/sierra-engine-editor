@@ -58,6 +58,10 @@ namespace SierraEditor::Project {
             if (scriptsNode) {
                 mData.scriptsPath = scriptsNode->value();
             }
+            xml_node<>* scenesNode = dirsNode->first_node("Scenes");
+            if (scenesNode) {
+                mData.scenesPath = scenesNode->value();
+            }
         }
 
         xml_node<>* metadataNode = root->first_node("Metadata");
@@ -108,6 +112,9 @@ namespace SierraEditor::Project {
 
         xml_node<>* scriptsNode = doc.allocate_node(node_type::node_element, "Scripts", doc.allocate_string(mData.scriptsPath.c_str()));
         dirsNode->append_node(scriptsNode);
+
+        xml_node<>* scenesNode = doc.allocate_node(node_type::node_element, "Scenes", doc.allocate_string(mData.scenesPath.c_str()));
+        dirsNode->append_node(scenesNode);
 
         xml_node<>* metadataNode = doc.allocate_node(node_type::node_element, "Metadata");
         root->append_node(metadataNode);
