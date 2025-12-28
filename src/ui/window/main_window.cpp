@@ -123,8 +123,33 @@ namespace SierraEditor::UI {
         fileMenu->addAction(exitAction);
 
         QMenu* editMenu = menuBar()->addMenu("Edit");
-        editMenu->addAction("Undo");
-        editMenu->addAction("Redo");
+
+        QAction* undoAction = new QAction("Undo", this);
+        undoAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_Z));
+        connect(undoAction, &QAction::triggered, this, [this]() {
+            std::shared_ptr<Project::SScene> scene = Stateful::StatefulManager::getInstance().undo();
+            if (scene) {
+                mCurrentScene = scene; // This should automatically update other panels, since they use std::shared_ptr*
+                LOG("Undid to scene state: " << (mCurrentScene ? mCurrentScene->getName() : "NULL"));
+            } else {
+                WARN("No more undo states available.");
+            }
+        });
+
+        QAction* redoAction = new QAction("Redo", this);
+        redoAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_Z));
+        connect(redoAction, &QAction::triggered, this, [this]() {
+            std::shared_ptr<Project::SScene> scene = Stateful::StatefulManager::getInstance().redo();
+            if (scene) {
+                mCurrentScene = scene;
+                LOG("Redid to scene state: " << (mCurrentScene ? mCurrentScene->getName() : "NULL"));
+            } else {
+                WARN("No more redo states available.");
+            }
+        });
+
+        editMenu->addAction(undoAction);
+        editMenu->addAction(redoAction);
         editMenu->addSeparator();
         editMenu->addAction("Cut");
         editMenu->addAction("Copy");
@@ -413,6 +438,9 @@ namespace SierraEditor::UI {
             mCurrentProject->setLastScene(mCurrentScene->getName());
             //mViewport->setCurrentScene(mCurrentScene);
             mViewport->switchToSceneView();
+
+            Stateful::StatefulManager::getInstance().saveCurrentState(mCurrentScene); // Add the first state for undo/redo
+            // Note: Every additional change to the scene should trigger saveCurrentState again.
         } else {
             mCurrentScene = nullptr; // Reset on failure
             ERROR("Failed to load scene at: " << scenePath.toStdString());

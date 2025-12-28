@@ -27,6 +27,7 @@
 #include <sierra/ui/widgets/generic_panel.hpp>
 #include <sierra/ui/widgets/console_output.hpp>
 #include <sierra/ui/widgets/profiler_panel.hpp>
+#include <sierra/stateful/stateful_manager.hpp>
 #include <sierra/project/sproject.hpp>
 #include <sierra/project/sscene.hpp>
 #include <sierra/logger.hpp>

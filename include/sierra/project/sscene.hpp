@@ -21,6 +21,18 @@ namespace SierraEditor::Project {
     class SScene {
         public:
             SScene(const std::string& filepath = "");
+            
+            // Define copy constructor and assignment
+            SScene(const SScene& other) {
+                mData = other.mData;
+            }
+
+            SScene& operator=(const SScene& other) {
+                if (this != &other) {
+                    mData = other.mData;
+                }
+                return *this;
+            }
 
             bool load();
             bool save();
