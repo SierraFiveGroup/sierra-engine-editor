@@ -131,20 +131,7 @@ namespace SierraEditor::UI {
             if (scene) {
                 mCurrentScene = scene; // This should automatically update other panels, since they use std::shared_ptr*
 
-                // Refresh Hierarchy Panel if it exists
-                for (const auto& pair : mActiveGenerics) {
-                    // Get tab references
-                    std::unordered_set<AlwaysVisibleTabWidget*> tabs = pair.second->getTabs();
-                    for (AlwaysVisibleTabWidget* tabWidget : tabs) {
-                        for (int i = 0; i < tabWidget->count(); i++) {
-                            QWidget* w = tabWidget->widget(i);
-                            HierarchyPanel* hierarchyPanel = qobject_cast<HierarchyPanel*>(w);
-                            if (hierarchyPanel) {
-                                hierarchyPanel->refresh();
-                            }
-                        }
-                    }
-                }
+                triggerRefresh();
 
                 LOG("Undid to scene state: " << (mCurrentScene ? mCurrentScene->getName() : "NULL"));
             } else {
@@ -529,6 +516,23 @@ namespace SierraEditor::UI {
         } else {
             mCurrentScene = nullptr; // Reset on failure
             ERROR("Failed to load scene at: " << scenePath.toStdString());
+        }
+    }
+
+    void MainWindow::triggerRefresh() {
+        // Refresh all panels that are RefreshablePanel
+        for (const auto& pair : mActiveGenerics) {
+            // Get tab references
+            std::unordered_set<AlwaysVisibleTabWidget*> tabs = pair.second->getTabs();
+            for (AlwaysVisibleTabWidget* tabWidget : tabs) {
+                for (int i = 0; i < tabWidget->count(); i++) {
+                    QWidget* w = tabWidget->widget(i);
+                    RefreshablePanel* refreshable = dynamic_cast<RefreshablePanel*>(w);
+                    if (refreshable) {
+                        refreshable->refresh();
+                    }
+                }
+            }
         }
     }
 }

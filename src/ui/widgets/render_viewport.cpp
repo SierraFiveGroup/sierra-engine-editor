@@ -51,6 +51,11 @@ namespace SierraEditor::UI {
         }
     }
 
+    void RenderViewport::refresh() {
+        // TODO
+        return;
+    }
+
     // ---- BlueScreenGL ----
 
     BlueScreenGL::BlueScreenGL(QWidget* parent, std::string* rendermsgPtr)

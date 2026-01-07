@@ -2,6 +2,7 @@
 // Licensed under LGPLv2.1
 
 #include <sierra/ui/widgets/hierarchy_panel.hpp>
+#include <sierra/ui/widgets/generic_panel.hpp>
 #include <QTimer>
 
 namespace SierraEditor::UI {
@@ -68,7 +69,20 @@ namespace SierraEditor::UI {
         // Populate entities
         for (const auto& entity : (*mCurrentSceneRef)->getEntities()) {
             QString entityName = QString::fromStdString(entity->getName());
-            new QTreeWidgetItem(mRootItem, QStringList() << entityName);
+            auto* entityItem = new QTreeWidgetItem(mRootItem, QStringList() << entityName);
+
+            // Attach a selection handler to each entity item
+            QObject::connect(mTree, &QTreeWidget::itemClicked, [entity](QTreeWidgetItem* item, int column) {
+                if (item->text(column) == QString::fromStdString(entity->getName())) {
+                    Stateful::SelectionManager::getInstance().setSelectedEntity(entity.get());
+                }
+
+                // Trigger main window to refresh (via parent)
+                auto* parentGeneric = qobject_cast<GenericPanel*>(item->treeWidget()->parentWidget());
+                if (parentGeneric) {
+                    parentGeneric->sendSignalToRefreshMainWindow();
+                }
+            });
         }
 
         mTree->expandAll();

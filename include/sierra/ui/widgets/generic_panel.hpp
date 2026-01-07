@@ -30,6 +30,8 @@ namespace SierraEditor::UI {
             return tabSet;
         }
 
+        void sendSignalToRefreshMainWindow();
+
     public slots:
         void addNewTab(QWidget* w, const QString& title);
 

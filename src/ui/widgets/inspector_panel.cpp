@@ -24,4 +24,10 @@ namespace SierraEditor::UI {
         layout->setContentsMargins(0, 0, 0, 0);
         setLayout(layout);
     }
+
+    void InspectorPanel::refresh() {
+        // TODO
+        DBG("InspectorPanel::refresh() called");
+        return;
+    }
 }

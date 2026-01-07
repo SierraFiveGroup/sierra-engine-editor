@@ -21,8 +21,10 @@
 
 #include <stb/stb_easy_font.h>
 
+#include <sierra/ui/widgets/refreshable_panel.hpp>
+
 namespace SierraEditor::UI {
-    class RenderViewport : public QWidget {
+    class RenderViewport : public QWidget, public RefreshablePanel {
         Q_OBJECT
         public:
             explicit RenderViewport(QWidget* parent = nullptr, std::string rendermsg = "No Project Loaded!");
@@ -37,6 +39,8 @@ namespace SierraEditor::UI {
 
             // Toggle camera details view (only in non-blue screen mode)
             void toggleCameraDetailsView();
+
+            void refresh() override;
         
         private:
             QTabWidget* mTabs;

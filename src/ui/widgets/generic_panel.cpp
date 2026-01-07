@@ -107,9 +107,20 @@ namespace SierraEditor::UI {
         addNewTab(newWidget, title);
     }
 
-    void GenericPanel::addNewTab(QWidget* w, const QString& title)
-    {
+    void GenericPanel::addNewTab(QWidget* w, const QString& title) {
         int newIndex = tabs->addTab(w, title);
         tabs->setCurrentIndex(newIndex);
+    }
+
+    void GenericPanel::sendSignalToRefreshMainWindow() {
+        // Find parent MainWindow and call triggerRefresh
+        QWidget* parentWidget = this->parentWidget();
+        while (parentWidget) {
+            if (auto* mainWindow = qobject_cast<MainWindow*>(parentWidget)) {
+                mainWindow->triggerRefresh();
+                return;
+            }
+            parentWidget = parentWidget->parentWidget();
+        }
     }
 }

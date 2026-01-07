@@ -8,9 +8,11 @@
 #include <QVBoxLayout>
 #include <memory>
 #include <sierra/project/sscene.hpp>
+#include <sierra/stateful/selection_manager.hpp>
+#include <sierra/ui/widgets/refreshable_panel.hpp>
 
 namespace SierraEditor::UI {
-    class HierarchyPanel : public QWidget {
+    class HierarchyPanel : public QWidget, public RefreshablePanel {
         Q_OBJECT
         public:
             explicit HierarchyPanel(std::shared_ptr<Project::SScene>* currentSceneRef, QWidget* parent = nullptr);
@@ -21,7 +23,7 @@ namespace SierraEditor::UI {
                 mPopulateHierarchy();
             }
 
-            void refresh() {
+            void refresh() override {
                 mPopulateHierarchy();
             }
 

@@ -50,6 +50,8 @@ namespace SierraEditor::UI {
                 return &mCurrentScene;
             }
 
+            void triggerRefresh();
+
         private:
             void mSetupDockPanels();
             void mSetupMenus();
