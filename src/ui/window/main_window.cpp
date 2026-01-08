@@ -113,6 +113,10 @@ namespace SierraEditor::UI {
             mSpawnGenericPanelWithWidget("Profiler", new ProfilerPanel());
         });
 
+        QAction* refreshWindowsAction = new QAction("Refresh Panels", this);
+        refreshWindowsAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_R));
+        connect(refreshWindowsAction, &QAction::triggered, this, &MainWindow::triggerRefresh);
+
         // Menus
         QMenu* fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(openProjectAction);
@@ -180,6 +184,8 @@ namespace SierraEditor::UI {
         windowMenu->addAction(spawnAssetBrowserAction);
         windowMenu->addAction(spawnConsoleAction);
         windowMenu->addAction(spawnProfilerAction);
+        windowMenu->addSeparator();
+        windowMenu->addAction(refreshWindowsAction);
 
         // TODO - discuss some keybinds with others since changing keybinds can be controversial
         QMenu* viewMenu = menuBar()->addMenu("View");
@@ -527,6 +533,7 @@ namespace SierraEditor::UI {
             for (AlwaysVisibleTabWidget* tabWidget : tabs) {
                 for (int i = 0; i < tabWidget->count(); i++) {
                     QWidget* w = tabWidget->widget(i);
+                    if (!w) continue;
                     RefreshablePanel* refreshable = dynamic_cast<RefreshablePanel*>(w);
                     if (refreshable) {
                         refreshable->refresh();

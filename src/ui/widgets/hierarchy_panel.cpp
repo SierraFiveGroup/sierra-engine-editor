@@ -50,6 +50,9 @@ namespace SierraEditor::UI {
     }
 
     void HierarchyPanel::mPopulateHierarchy() {
+        // Disconnect all previous connections to avoid dangling pointers
+        disconnect(mTree, &QTreeWidget::itemClicked, nullptr, nullptr);
+        
         mTree->clear();
 
         if (!mCurrentSceneRef) {
@@ -70,20 +73,30 @@ namespace SierraEditor::UI {
         for (const auto& entity : (*mCurrentSceneRef)->getEntities()) {
             QString entityName = QString::fromStdString(entity->getName());
             auto* entityItem = new QTreeWidgetItem(mRootItem, QStringList() << entityName);
+            
+            // Store entity pointer in item data for later retrieval
+            entityItem->setData(0, Qt::UserRole, QVariant::fromValue(static_cast<void*>(entity.get())));
+        }
 
-            // Attach a selection handler to each entity item
-            QObject::connect(mTree, &QTreeWidget::itemClicked, [entity](QTreeWidgetItem* item, int column) {
-                if (item->text(column) == QString::fromStdString(entity->getName())) {
-                    Stateful::SelectionManager::getInstance().setSelectedEntity(entity.get());
-                }
-
-                // Trigger main window to refresh (via parent)
-                auto* parentGeneric = qobject_cast<GenericPanel*>(item->treeWidget()->parentWidget());
+        // Single connection for all items
+        QObject::connect(mTree, &QTreeWidget::itemClicked, this, [this](QTreeWidgetItem* item, int column) {
+            if (!item) return;
+            
+            // Retrieve entity pointer from item data
+            void* entityPtr = item->data(0, Qt::UserRole).value<void*>(); // TODO: push to selection manager correctly
+            if (entityPtr) {
+                Stateful::SelectionManager::getInstance().setSelectedEntity(static_cast<Project::SEntity*>(entityPtr));
+                
+                // Trigger main window to refresh (via parent); TODO: Move to refreshable panel system as a callable, universal method
+                auto* parentGeneric = qobject_cast<GenericPanel*>(item->treeWidget()->parentWidget()->parentWidget()->parentWidget()->parentWidget()); // Took some attempts; this code is weird, I should fix this eventually
+                //DBG(parentGeneric);
                 if (parentGeneric) {
+                    mBlockNextRefresh = true;
+                    //DBG("Exists!");
                     parentGeneric->sendSignalToRefreshMainWindow();
                 }
-            });
-        }
+            }
+        });
 
         mTree->expandAll();
     }

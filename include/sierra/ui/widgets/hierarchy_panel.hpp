@@ -24,6 +24,11 @@ namespace SierraEditor::UI {
             }
 
             void refresh() override {
+                if (mBlockNextRefresh) {
+                    mBlockNextRefresh = false; // Allow next refresh
+                    return;
+                }
+
                 mPopulateHierarchy();
             }
 
@@ -41,6 +46,8 @@ namespace SierraEditor::UI {
 
         private:
             void mPopulateHierarchy();
+
+            bool mBlockNextRefresh = false;
             
             QTreeWidget* mTree;
             QTreeWidgetItem* mRootItem;

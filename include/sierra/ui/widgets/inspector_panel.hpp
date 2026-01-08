@@ -8,6 +8,7 @@
 #include <QVBoxLayout>
 #include <sierra/stateful/selection_manager.hpp>
 #include <sierra/ui/widgets/refreshable_panel.hpp>
+#include <sierra/project/sentity.hpp>
 #include <sierra/logger.hpp>
 
 namespace SierraEditor::UI {

@@ -114,13 +114,18 @@ namespace SierraEditor::UI {
 
     void GenericPanel::sendSignalToRefreshMainWindow() {
         // Find parent MainWindow and call triggerRefresh
+        //DBG("GenericPanel: Sending signal to refresh main window.");
+        //HANG();
         QWidget* parentWidget = this->parentWidget();
         while (parentWidget) {
-            if (auto* mainWindow = qobject_cast<MainWindow*>(parentWidget)) {
+            if (auto* dock = qobject_cast<QDockWidget*>(parentWidget)) {
+                parentWidget = dock->parentWidget();
+            } else if (auto* mainWindow = qobject_cast<MainWindow*>(parentWidget)) {
                 mainWindow->triggerRefresh();
                 return;
+            } else {
+                parentWidget = parentWidget->parentWidget();
             }
-            parentWidget = parentWidget->parentWidget();
         }
     }
 }

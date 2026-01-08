@@ -9,15 +9,18 @@ namespace SierraEditor::UI {
     {
         mList = new QListWidget(this);
 
-        // Placeholders
-        mList->addItem("Transform");
-        mList->addItem(" - Position: (0,0,0)");
-        mList->addItem(" - Rotation: (0,0,0)");
-        mList->addItem(" - Scale: (1,1,1)");
-        mList->addItem("");
-        mList->addItem("MeshRenderer");
-        mList->addItem(" - Mesh: Cube");
-        mList->addItem(" - Material: Default");
+        Project::SEntity* selectedEntity = Stateful::SelectionManager::getInstance().getSelectedEntity();
+        if (selectedEntity) {
+            mList->addItem(QString::fromStdString("Selected Entity: " + selectedEntity->getName()));
+            mList->addItem(QString::fromStdString("Active: " + std::string(selectedEntity->isActive() ? "Yes" : "No")));
+            mList->addItem("Components:");
+            // List components
+            for (const std::string& comp : selectedEntity->getComponents()) {
+                mList->addItem(QString::fromStdString(" - " + comp));
+            }
+        } else {
+            mList->addItem("No entity selected.");
+        }
 
         QVBoxLayout* layout = new QVBoxLayout(this);
         layout->addWidget(mList);

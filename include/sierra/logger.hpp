@@ -185,3 +185,12 @@ namespace SierraEditor {
         SierraEditor::detail::addConsoleLog(SierraEditor::LogEntry::Level::DEBUG, SIERRA_LOG_FUNCTION, __FILE__, _se_log_stream.str()); \
     } while (0)
 #endif
+
+#ifndef HANG
+#define HANG() \
+    do { \
+        ERRPRINTF("\033[31m(HANG) %s: This thread has reached a hang point. Press Enter to continue execution.\033[0m\n", SIERRA_LOG_FUNCTION); \
+        std::cerr << std::flush; \
+        std::cin.get(); \
+    } while (0)
+#endif

@@ -23,6 +23,9 @@ namespace SierraEditor::Project {
             void addComponent(const std::string& componentName);
             void removeComponent(const std::string& componentName);
             bool hasComponent(const std::string& componentName) const;
+            const std::unordered_set<std::string>& getComponents() const {
+                return mComponents;
+            }
             // TODO: getComponentByName/ById
 
         private:
