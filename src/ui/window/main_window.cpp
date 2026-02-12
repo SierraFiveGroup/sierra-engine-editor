@@ -54,6 +54,16 @@ namespace SierraEditor::UI {
             }
         });
 
+        QAction* unloadSceneAction = new QAction("Unload Scene", this);
+        unloadSceneAction->setShortcut(QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_L));
+        connect(unloadSceneAction, &QAction::triggered, this, [this]() {
+            mCurrentScene->save(); // Auto-save current scene before unloading; TODO: Prompt user to save if there are unsaved changes
+            mCurrentScene = nullptr;
+            mViewport->setRenderMessage("No Scene Loaded!");
+            triggerRefresh();
+            LOG("Scene unloaded.");
+        });
+
         QAction* saveAllAction = new QAction("Save All", this);
         saveAllAction->setShortcut(QKeySequence(Qt::CTRL | Qt::Key_S));
         connect(saveAllAction, &QAction::triggered, this, [this]() {
@@ -121,6 +131,7 @@ namespace SierraEditor::UI {
         QMenu* fileMenu = menuBar()->addMenu("File");
         fileMenu->addAction(openProjectAction);
         fileMenu->addAction(openSceneAction);
+        fileMenu->addAction(unloadSceneAction);
         fileMenu->addSeparator();
         fileMenu->addAction(saveAllAction);
         fileMenu->addSeparator();
